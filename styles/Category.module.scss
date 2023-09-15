@@ -1,0 +1,51 @@
+@import "variables";
+
+.pageWrapper {
+  padding: 2rem 6rem;
+  padding: 2% 4% 4%;
+  background-color: #f8f8f8;
+  min-height: calc(100vh - 64px);
+}
+
+.margin {
+  margin: 0;
+}
+
+.headingCategorias {
+  @include font($bold, 30px, $black);
+  margin: 20px 0 40px;
+}
+.bannerWrapper {
+  width: 100%;
+  height: 100%;
+  max-height: 360px;
+  position: relative;
+  overflow: hidden;
+  @include flex(center, center);
+
+  .textContainer {
+    width: 100%;
+    height: auto;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.7) 0%,
+      #000000 0.01%,
+      rgba(0, 0, 0, 0.7) 49.48%,
+      rgba(0, 0, 0, 0.37) 100%
+    );
+    padding: 24px 5%;
+    @include flex(flex-start, stretch, column);
+    gap: 6px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+
+    .headingBanner {
+      @include font($bold, 30px, #fff);
+    }
+    .subheadingBanner {
+      @include font($semibold, 22px, #c0c0c0);
+    }
+  }
+}

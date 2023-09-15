@@ -1,0 +1,131 @@
+@import "_variables.scss";
+
+.pageWrapper {
+    background-color: #fff;
+    width: 100vw;
+    // min-height: calc(100vh - 64px - 150px);
+    padding: 5%;
+    background-color: #999999;
+    margin-top: 64px;
+}
+/* Página Login */
+.grid {
+    overflow: hidden;
+    border-radius: 10px;
+    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.15));
+    max-height: 500px;
+    max-width: 1100px;
+    margin: auto;
+
+    .gridImg {
+        overflow: hidden;
+    }
+
+    .imgWrapper {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .loginImg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        max-height: 500px;
+        object-position: bottom;
+    }
+}
+.gridLogin {
+    background-color: #fff;
+    @include flexcenter();
+
+    .loginContainer {
+        @include flex(center, stretch, column);
+        gap: 20px;
+        padding: 10%;
+        align-self: flex-start;
+
+        .title {
+            @include font($bold, 40px, $black);
+
+            @media screen and (max-width: 700px) {
+                font-size: 32px;
+            }
+        }
+        .subtitle {
+            @include font($regular, 20px, $black);
+            margin-bottom: 16px;
+            line-height: 20px;
+            @media screen and (max-width: 700px) {
+                font-size: 18px;
+            }
+        }
+        .textCheckbox {
+            font-size: 14px;
+            line-height: 16px;
+        }
+
+        label {
+            top: -6px;
+        }
+
+        .checkboxWrapper {
+            @include flex(flex-start, center);
+            gap: 4px;
+        }
+        .linkText {
+            @include font($medium, 13px, $black);
+            text-decoration: dotted;
+            text-align: right;
+            a {
+                color: $black;
+            }
+            @media (hover: hover) {
+                &:hover {
+                    color: $purple;
+                }
+            }
+        }
+        .btnWrapper {
+            @include flex(flex-start, stretch, column);
+            gap: 12px;
+        }
+    }
+
+    form {
+        @include flex(flex-start, stretch, column);
+        gap: 20px;
+
+        div {
+            flex: 1;
+        }
+    }
+}
+
+/* Página Registar */
+
+.gridRegistar {
+    overflow: hidden;
+    border-radius: 10px;
+    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.15));
+    max-width: 1100px;
+    margin: auto;
+    max-height: 700px;
+
+    .gridImg {
+        overflow: hidden;
+    }
+
+    .imgWrapper {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .loginImg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: bottom;
+    }
+}

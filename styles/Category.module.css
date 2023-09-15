@@ -1,0 +1,11 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap");
+.pageWrapper {
+  padding: 2rem 6rem;
+  padding: 4%;
+  background-color: #f8f8f8;
+  height: calc(100vh - 64px);
+}
+
+.margin {
+  margin: 0;
+}/*# sourceMappingURL=Category.module.css.map */
