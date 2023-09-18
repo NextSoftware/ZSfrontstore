@@ -92,9 +92,9 @@ const Home = ({
       //     );
       //   }
       // }
-      if (field.includes("category")) {
+      if (field.includes("category") && !router.asPath.includes("sub")) {
         let index;
-        let prodArraySave: any = [];
+
         //try with decode, if decode gives error just grab it without decoding
         try {
           index = familyArray
@@ -115,36 +115,38 @@ const Home = ({
               }
             }
           }
-          //save incase the subcategory doesn't have items
-          prodArraySave = filteredProductArray;
         }
-        if (field.includes("subcategory")) {
-          filteredProductArray = [];
-          let subIndex;
-          try {
-            subIndex = subFamily
-              .map((e: any) => e.descricao)
-              .indexOf(decodeURIComponent(field.split("=")[1]));
-          } catch (error) {
-            subIndex = subFamily
-              .map((e: any) => e.descricao)
-              .indexOf(field.split("=")[1]);
-          }
+      }
 
-          const subId = await subFamily[subIndex].codigo;
+      if (field.includes("subcat")) {
+        let subIndex;
 
-          for await (const element of productArray) {
-            if (element.subfam == subId) {
-              if (!filteredProductArray.includes(element)) {
-                filteredProductArray.push(element);
-              }
+        subIndex = subFamily
+          .map((e: any) => e.descricao)
+          .indexOf(decodeField(field.split("=")[1].split("_")[0]));
+
+        console.log(subIndex);
+        const subId = await subFamily[subIndex].codigo;
+        for await (const element of productArray) {
+          if (element.subfam == subId) {
+            if (!filteredProductArray.includes(element)) {
+              filteredProductArray.push(element);
             }
-          }
-          if (filteredProductArray.length === 0) {
-            filteredProductArray = prodArraySave;
           }
         }
       }
+
+      // if(field.includes("stock")){
+      //   if(field.split("=")[1] = "Y"){
+      //     console.log("stockArray")
+      //     console.log(filteredProductArray.filter((product:any) => product.prodstock > 0))
+      //   }
+
+      //   if(field.split("=")[1] = "N"){
+      //     console.log("stockArray")
+      //     console.log(filteredProductArray.filter((product:any) => product.prodstock <= 0))
+      //   }
+      // }
     }
 
     if (filterArray.toString().includes("orderBy")) {
@@ -197,6 +199,7 @@ const Home = ({
             .indexOf(decodedField.split("=")[1].toLowerCase()) > -1
       );
     }
+
     console.log(filteredProductArray);
     return filteredProductArray;
   }
@@ -207,18 +210,21 @@ const Home = ({
       urlBase = window.location.href.split("?");
       let exist = false;
       if (!window.location.href.includes("&")) {
-        router.push(window.location.href + "&" + field);
+        if (!window.location.href.includes(field)) {
+          router.push(window.location.href + "&" + field);
+        }
       } else {
-        let urlArray = urlBase[1].split("&");
+        const urlArray = urlBase[1].split("&");
+
         for await (const iterator of urlArray) {
+          const decodedString = decodeField(iterator);
           if (
-            decodeURIComponent(iterator) == field ||
-            decodeURIComponent(iterator) == field + "&"
+            decodeField(iterator) == decodeField(field) ||
+            decodeField(iterator) == decodeField(field + "&")
           ) {
             exist = true;
           }
         }
-
         if (!exist) {
           router.push(window.location.href + "&" + field);
         }
@@ -395,12 +401,14 @@ const Home = ({
           <CategoryFilters
             famArray={familyArray}
             subFamArray={subFamily}
-            prodArray={
-              filterProdArray.length > 0 ? filterProdArray : productArray
-            }
+            prodArray={productArray}
+            min={Math.min(...productArray.map((o: any) => o.precovenda))}
+            max={Math.max(...productArray.map((o: any) => o.precovenda))}
+            step={Math.round(
+              Math.max(...productArray.map((o: any) => o.precovenda)) / 14
+            )}
             urlPrice={urlPrice}
             setUrlPrice={setUrlPrice}
-            setProdArray={setFilterProdArray}
           />
         </Grid>
         <Grid xs={6} sm={8} md={9} lg={10} className="grid-products">
@@ -408,44 +416,48 @@ const Home = ({
             {filterProdArray.length > 0 ? (
               <>
                 {filterProdArray.map((item: any) => (
-                  <>
+                  <React.Fragment key={"selectedCatedory" + item.codigo}>
                     {urlPrice[0] <= item.precovenda &&
                     urlPrice[1] >= item.precovenda ? (
-                      <Grid
-                        xs={12}
-                        sm={4}
-                        md={3}
-                        lg={2}
-                        key={"selectedCatedory" + item.codigo}
-                      >
+                      <Grid xs={12} sm={4} md={3} lg={2}>
                         <ProductItemMain data={item} />
                       </Grid>
                     ) : (
                       <></>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </>
             ) : (
               <>
-                {productArray.map((item: any) => (
-                  <>
-                    {urlPrice[0] <= item.precovenda &&
-                    urlPrice[1] >= item.precovenda ? (
-                      <Grid
-                        xs={12}
-                        sm={4}
-                        md={3}
-                        lg={2}
-                        key={"selectedCatedory" + item.codigo}
-                      >
-                        <ProductItemMain data={item} />
-                      </Grid>
-                    ) : (
-                      <></>
-                    )}
-                  </>
-                ))}
+                {!router.asPath.includes("?") ? (
+                  productArray.map((item: any) => (
+                    <React.Fragment key={"selectedCatedory" + item.codigo}>
+                      {urlPrice[0] <= item.precovenda &&
+                      urlPrice[1] >= item.precovenda ? (
+                        <Grid xs={12} sm={4} md={3} lg={2}>
+                          <ProductItemMain data={item} />
+                        </Grid>
+                      ) : (
+                        <></>
+                      )}
+                    </React.Fragment>
+                  ))
+                ) : (
+                  <div className="success-wrapper-cat">
+                    {" "}
+                    <Image
+                      src={errorImg}
+                      alt="Encomenda Completa"
+                      width={100}
+                      height={100}
+                    ></Image>
+                    <Typography className="title-container">
+                      Não foi possivel encontrar o que procura!
+                    </Typography>
+                    <Typography>Por favor tente de novo.</Typography>
+                  </div>
+                )}
               </>
             )}
 
@@ -501,14 +513,14 @@ const Home = ({
 
 async function fetchSubFamlies() {
   // Fetch data from endpoint 1
-  const response = await fetch("http://localhost:4700/subfamily/all");
+  const response = await fetch(`${process.env.ZONE_API}subfamily/all`);
   const data = await response.json();
   return data;
 }
 
 async function fetchFamilies() {
   // Fetch data from endpoint 1
-  const response = await fetch("http://localhost:4700/family/all");
+  const response = await fetch(`${process.env.ZONE_API}family/all`);
   const data = await response.json();
   return data;
 }
@@ -516,7 +528,7 @@ async function fetchFamilies() {
 // Function to fetch data from the second endpoint
 async function fetchProducts() {
   // Fetch data from endpoint 2
-  const response = await fetch("http://localhost:4700/products/all");
+  const response = await fetch(`${process.env.ZONE_API}products/all`);
   const data = await response.json();
   return data;
 }
@@ -527,6 +539,23 @@ export async function getServerSideProps() {
   const dataFromSubFamilies = await fetchSubFamlies();
   const dataFromProducts = await fetchProducts();
   return { props: { dataFromFamilies, dataFromSubFamilies, dataFromProducts } };
+}
+
+function hasSpecialCharacters(inputString: string) {
+  // Define a regular expression pattern to match any special character.
+  const pattern = /[!@#$%^&*()_+{}\[\]:;"'<>.,?/~`\\|\\\-]/;
+
+  // Use the test() method of the RegExp object to check if the pattern matches the input string.
+  return pattern.test(inputString);
+}
+
+function decodeField(field: any) {
+  try {
+    decodeURIComponent(field);
+    return decodeURIComponent(field);
+  } catch (error) {
+    return field;
+  }
 }
 
 export default Home;

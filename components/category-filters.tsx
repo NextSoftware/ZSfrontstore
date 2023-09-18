@@ -5,10 +5,8 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Typography from "@mui/material/Typography";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
-import { Box, Button, Checkbox, Slider } from "@mui/material";
-import axios from "axios";
+import { Checkbox, Slider } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 
 const label = { inputProps: { "aria-label": "Impressoras" } };
 
@@ -20,25 +18,22 @@ function valuetext(value: number) {
 const CategoryFilters = ({
   famArray,
   subFamArray,
-  prodArray,
+  max,
+  min,
+  step,
   urlPrice,
   setUrlPrice,
-  setProdArray,
 }: any) => {
   const router = useRouter();
 
-  // React.useEffect(() => {
-  //   const arrayhandle = async () => {
-  //     props.cateArray.sort((a: any, b: any) => a.id - b.id);
-  //     console.log();
-  //     setArr(
-  //       props.cateArray.filter(
-  //         (el: any) => el.Slug !== window.location.href.split("/")[4]
-  //       )
-  //     );
-  //   };
-  //   arrayhandle();
-  // }, []);
+  function decodeField(field: any) {
+    try {
+      decodeURIComponent(field);
+      return decodeURIComponent(field);
+    } catch (error) {
+      return field;
+    }
+  }
   async function ChangePriceOnURL(newValue: number[]) {
     let field = `price=${urlPrice[0] + "_" + urlPrice[1]}`;
     if (!window.location.href.includes("price")) {
@@ -47,6 +42,7 @@ const CategoryFilters = ({
       urlReplacer("price", field);
     }
   }
+
   const handlePriceChange = async (
     event: Event,
     newValue: number | number[],
@@ -77,10 +73,10 @@ const CategoryFilters = ({
         const urlArray = urlBase[1].split("&");
 
         for await (const iterator of urlArray) {
-          console.log(iterator);
+          const decodedString = decodeField(iterator);
           if (
-            decodeURIComponent(iterator) == field ||
-            decodeURIComponent(iterator) == field + "&"
+            decodeField(iterator) == decodeField(field) ||
+            decodeField(iterator) == decodeField(field + "&")
           ) {
             exist = true;
           }
@@ -125,25 +121,27 @@ const CategoryFilters = ({
     }
   }
 
-  async function urlRemove(field: string, marcaArray?: any) {
+  function hasSpecialCharacters(inputString: string) {
+    // Define a regular expression pattern to match any special character.
+    const pattern = /[!@#$%^&*()_+{}\[\]:;"'<>.,?/~`\\|\\\-]/;
+
+    // Use the test() method of the RegExp object to check if the pattern matches the input string.
+    return pattern.test(inputString);
+  }
+
+  async function urlRemove(field: string) {
     let exist = false;
     if (window.location.href.includes("?")) {
       let urlBase = window.location.href.split("?");
       let urlArray = urlBase[1].split("&");
       for (const iterator of urlArray) {
-        console.log(decodeURIComponent(iterator));
         if (
-          decodeURIComponent(iterator) == field ||
-          decodeURIComponent(iterator) == field + "&"
+          decodeField(iterator) == field ||
+          decodeField(iterator) == field + "&"
         ) {
           exist = true;
           urlArray = urlArray.filter(
-            (el) => decodeURIComponent(el) !== decodeURIComponent(iterator)
-          );
-        }
-        if (iterator.includes("price") && field.includes("price")) {
-          urlArray = urlArray.filter(
-            (el) => decodeURIComponent(el) !== decodeURIComponent(iterator)
+            (el) => decodeField(el) !== decodeField(iterator)
           );
         }
       }
@@ -166,18 +164,9 @@ const CategoryFilters = ({
       }
     }
   }
-  // const [urlPrice, setUrlPrice] = React.useState<number[]>([
-  //   Math.min(...prodArray.map((o: any) => o.precovenda)),
-  //   Math.max(...prodArray.map((o: any) => o.precovenda)),
-  // ]);
-  
-  //const minDistance = 10;
 
-  //const [value1, setValue1] = React.useState<number[]>([0, 100]);
   const [isSubscribed, setIsSubscribed] = React.useState(false);
-
   /*  */
-
   return (
     <div className="wrapper-filters">
       {/* Categorias */}
@@ -217,13 +206,17 @@ const CategoryFilters = ({
                 >
                   <div className="flex-item">
                     <Checkbox
-                      // checked={
-                      //   router.asPath.includes(
-                      //     encodeURI(`category=${item.descricao}`)
-                      //   )
-                      //     ? true
-                      //     : false
-                      // }
+                      disabled={
+                        router.asPath.includes(`subcat=`) ?true:false
+                      }
+                      checked={
+                        router.asPath.includes(
+                          encodeURI(`category=${item.descricao+"_"+item.lastupdate.split(".")[1]}`)
+                        ) ||
+                        router.asPath.includes(`category=${item.descricao+"_"+item.lastupdate.split(".")[1]}`)
+                          ? true
+                          : false
+                      }
                       sx={{
                         "&.Mui-checked": {
                           color: "#b277e0",
@@ -231,24 +224,13 @@ const CategoryFilters = ({
                       }}
                       onChange={async (checkEvent: any) => {
                         let field = "";
-                        field = `category=${item?.descricao}`;
+                        field = `category=${item.descricao+"_"+item.lastupdate.split(".")[1]}`;
 
                         if (checkEvent.target.checked == true) {
                           urlManager(field);
-                          // setProdArray(
-                          //   prodArray.filter(
-                          //     (x: any) => x.familia == item.codigo
-                          //   )
-                          // );
                         }
                         if (checkEvent.target.checked == false) {
-                          //urlRemove(field);
-                          router.replace(window.location.href.split("?")[0]);
-                          // setProdArray(
-                          //   prodArray.filter(
-                          //     (x: any) => x.familia !== item.codigo
-                          //   )
-                          // );
+                          urlRemove(field);
                         }
                       }}
                     />
@@ -264,10 +246,7 @@ const CategoryFilters = ({
                       <Checkbox
                         checked={
                           router.asPath.includes(
-                            encodeURI(`subcategory=${subFam.descricao}`)
-                          ) &&
-                          router.asPath.includes(
-                            encodeURI(`category=${item.descricao}`)
+                            encodeURI(`subcat=${subFam.descricao+"_"+subFam.lastupdate.split(".")[1]}`)
                           )
                             ? true
                             : false
@@ -279,24 +258,14 @@ const CategoryFilters = ({
                         }}
                         onChange={async (checkEvent: any) => {
                           let field = "";
-                          field = `subcategory=${subFam?.descricao}`;
+                          field = `subcat=${subFam.descricao+"_"+subFam.lastupdate.split(".")[1]}`;
 
                           if (checkEvent.target.checked == true) {
+                            console.log(field);
                             urlManager(field);
-                            // setProdArray(
-                            //   prodArray.filter(
-                            //     (x: any) => x.subfam == subFam.codigo
-                            //   )
-                            // );
                           }
                           if (checkEvent.target.checked == false) {
                             urlRemove(field);
-
-                            // setProdArray(
-                            //   prodArray.filter(
-                            //     (x: any) => x.familia == item.codigo
-                            //   )
-                            // );
                           }
                         }}
                       />
@@ -388,7 +357,6 @@ const CategoryFilters = ({
                 valueLabelDisplay="auto"
                 getAriaValueText={valuetext}
                 disableSwap
-                //step={Math.round(maxPrice/10)}
                 // marks={[
                 //   {
                 //     value: Math.round(0),
@@ -397,17 +365,9 @@ const CategoryFilters = ({
                 //     value: Math.round(100),
                 //   },
                 // ]}
-                min={Math.min(
-                  ...prodArray.map((o: any) => o.precovenda)
-                )}
-                max={Math.max(
-                  ...prodArray.map((o: any) => o.precovenda)
-                )}
-                step={Math.round(
-                  Math.max(
-                    ...prodArray.map((o: any) => o.precovenda)
-                  ) / 14
-                )}
+                min={min}
+                max={max}
+                step={step}
                 sx={{ color: "#b277e0" }}
               />
             </AccordionDetails>
