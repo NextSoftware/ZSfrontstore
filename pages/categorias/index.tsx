@@ -72,39 +72,14 @@ const Home = ({
     let filteredProductArray: any = [];
     filterArray = await filterArray.sort();
     for await (const field of filterArray) {
-      //save for later if i need to change logic
-      // if (field.includes("price")) {
-      //   const maxPrice = Number(field.split("=")[1].split("_")[1]);
-      //   const minPrice = Number(field.split("=")[1].split("_")[0]);
-      //   if (filteredProductArray.length == 0 && productArray.length > 0) {
-      //     for await (const element of productArray) {
-      //       if (
-      //         element.precovenda >= minPrice &&
-      //         element.precovenda <= maxPrice
-      //       ) {
-      //         filteredProductArray.push(element);
-      //       }
-      //     }
-      //   } else {
-      //     filteredProductArray = filteredProductArray.filter(
-      //       (el: any) =>
-      //         el.Products.Price >= minPrice && el.Products.Price <= maxPrice
-      //     );
-      //   }
-      // }
+
       if (field.includes("category") && !router.asPath.includes("sub")) {
         let index;
 
         //try with decode, if decode gives error just grab it without decoding
-        try {
-          index = familyArray
-            .map((e: any) => e.descricao)
-            .indexOf(decodeURIComponent(field.split("=")[1]));
-        } catch (error) {
-          index = familyArray
-            .map((e: any) => e.descricao)
-            .indexOf(field.split("=")[1]);
-        }
+        index = familyArray
+        .map((e: any) => e.descricao)
+        .indexOf(decodeField(field.split("=")[1].split("_")[0]));
 
         if (index > 0) {
           const id = await familyArray[index].codigo;
@@ -125,7 +100,7 @@ const Home = ({
           .map((e: any) => e.descricao)
           .indexOf(decodeField(field.split("=")[1].split("_")[0]));
 
-        console.log(subIndex);
+
         const subId = await subFamily[subIndex].codigo;
         for await (const element of productArray) {
           if (element.subfam == subId) {
@@ -200,7 +175,7 @@ const Home = ({
       );
     }
 
-    console.log(filteredProductArray);
+    //console.log(filteredProductArray);
     return filteredProductArray;
   }
 
