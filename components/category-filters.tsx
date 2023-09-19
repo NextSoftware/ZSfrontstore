@@ -73,7 +73,6 @@ const CategoryFilters = ({
         const urlArray = urlBase[1].split("&");
 
         for await (const iterator of urlArray) {
-          const decodedString = decodeField(iterator);
           if (
             decodeField(iterator) == decodeField(field) ||
             decodeField(iterator) == decodeField(field + "&")
@@ -121,13 +120,13 @@ const CategoryFilters = ({
     }
   }
 
-  function hasSpecialCharacters(inputString: string) {
-    // Define a regular expression pattern to match any special character.
-    const pattern = /[!@#$%^&*()_+{}\[\]:;"'<>.,?/~`\\|\\\-]/;
+  // function hasSpecialCharacters(inputString: string) {
+  //   // Define a regular expression pattern to match any special character.
+  //   const pattern = /[!@#$%^&*()_+{}\[\]:;"'<>.,?/~`\\|\\\-]/;
 
-    // Use the test() method of the RegExp object to check if the pattern matches the input string.
-    return pattern.test(inputString);
-  }
+  //   // Use the test() method of the RegExp object to check if the pattern matches the input string.
+  //   return pattern.test(inputString);
+  // }
 
   async function urlRemove(field: string) {
     let exist = false;
@@ -138,6 +137,44 @@ const CategoryFilters = ({
         if (
           decodeField(iterator) == field ||
           decodeField(iterator) == field + "&"
+        ) {
+          exist = true;
+          urlArray = urlArray.filter(
+            (el) => decodeField(el) !== decodeField(iterator)
+          );
+        }
+      }
+
+      if (exist) {
+        let newUrl = urlBase[0];
+        for (let index = 0; index < urlArray.length; index++) {
+          if (index == 0) {
+            newUrl += "?" + urlArray[index];
+          }
+          if (index >= 1) {
+            newUrl += "&" + urlArray[index];
+          }
+        }
+        if (newUrl.includes("?")) {
+          router.push(newUrl);
+        } else {
+          router.replace(newUrl);
+        }
+      }
+    }
+  }
+
+  async function urlRemoveCategories(field:string) {
+    let exist = false;
+    if (window.location.href.includes("?")) {
+      let urlBase = window.location.href.split("?");
+      let urlArray = urlBase[1].split("&");
+      for (const iterator of urlArray) {
+        if (
+          decodeField(iterator) == field ||
+          decodeField(iterator) == field + "&" ||
+          decodeField(iterator).includes("subcat") ||
+          decodeField(iterator).includes("subcat" + "&")
         ) {
           exist = true;
           urlArray = urlArray.filter(
@@ -206,14 +243,22 @@ const CategoryFilters = ({
                 >
                   <div className="flex-item">
                     <Checkbox
-                      disabled={
-                        router.asPath.includes(`subcat=`) ?true:false
-                      }
+                      // disabled={
+                      //   router.asPath.includes(`subcat=`) ? true : false
+                      // }
                       checked={
                         router.asPath.includes(
-                          encodeURI(`category=${item.descricao+"_"+item.lastupdate.split(".")[1]}`)
+                          encodeURI(
+                            `category=${item.descricao +
+                              "_" +
+                              item.lastupdate.split(".")[1]}`
+                          )
                         ) ||
-                        router.asPath.includes(`category=${item.descricao+"_"+item.lastupdate.split(".")[1]}`)
+                        router.asPath.includes(
+                          `category=${item.descricao +
+                            "_" +
+                            item.lastupdate.split(".")[1]}`
+                        )
                           ? true
                           : false
                       }
@@ -224,13 +269,15 @@ const CategoryFilters = ({
                       }}
                       onChange={async (checkEvent: any) => {
                         let field = "";
-                        field = `category=${item.descricao+"_"+item.lastupdate.split(".")[1]}`;
+                        field = `category=${item.descricao +
+                          "_" +
+                          item.lastupdate.split(".")[1]}`;
 
                         if (checkEvent.target.checked == true) {
                           urlManager(field);
                         }
                         if (checkEvent.target.checked == false) {
-                          urlRemove(field);
+                          urlRemoveCategories(field);
                         }
                       }}
                     />
@@ -246,7 +293,11 @@ const CategoryFilters = ({
                       <Checkbox
                         checked={
                           router.asPath.includes(
-                            encodeURI(`subcat=${subFam.descricao+"_"+subFam.lastupdate.split(".")[1]}`)
+                            encodeURI(
+                              `subcat=${subFam.descricao +
+                                "_" +
+                                subFam.lastupdate.split(".")[1]}`
+                            )
                           )
                             ? true
                             : false
@@ -258,10 +309,12 @@ const CategoryFilters = ({
                         }}
                         onChange={async (checkEvent: any) => {
                           let field = "";
-                          field = `subcat=${subFam.descricao+"_"+subFam.lastupdate.split(".")[1]}`;
+                          field = `subcat=${subFam.descricao +
+                            "_" +
+                            subFam.lastupdate.split(".")[1]}`;
 
                           if (checkEvent.target.checked == true) {
-                            console.log(field);
+                            //console.log(field);
                             urlManager(field);
                           }
                           if (checkEvent.target.checked == false) {
@@ -318,21 +371,22 @@ const CategoryFilters = ({
               sx={{ minHeigth: 0 }}
             >
               <div className="flex-item">
-                <Checkbox
+                {/* <Checkbox
                   sx={{
                     "&.Mui-checked": {
                       color: "#b277e0",
                     },
                   }}
                   checked={router.asPath.includes(`price=`) ? true : false}
-                  onChange={(checkEvent) => {
-                    if (checkEvent.target.checked == false) {
-                      urlRemove(`price=${urlPrice[0] + "_" + urlPrice[1]}`);
-                    } else {
-                      urlManager(`price=${urlPrice[0] + "_" + urlPrice[1]}`);
-                    }
-                  }}
-                />
+                  // onChange={(checkEvent) => {
+                  //   if (checkEvent.target.checked == false) {
+                  //     urlRemove(`price=${urlPrice[0] + "_" + urlPrice[1]}`);
+                  //   } else {
+                  //     urlManager(`price=${urlPrice[0] + "_" + urlPrice[1]}`);
+                  //   }
+                  // }}
+                /> */}
+
                 <Typography className="title-item">
                   Intrevalo de Preços
                 </Typography>

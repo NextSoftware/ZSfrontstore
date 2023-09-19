@@ -72,14 +72,13 @@ const Home = ({
     let filteredProductArray: any = [];
     filterArray = await filterArray.sort();
     for await (const field of filterArray) {
-
       if (field.includes("category") && !router.asPath.includes("sub")) {
         let index;
 
         //try with decode, if decode gives error just grab it without decoding
         index = familyArray
-        .map((e: any) => e.descricao)
-        .indexOf(decodeField(field.split("=")[1].split("_")[0]));
+          .map((e: any) => e.descricao)
+          .indexOf(decodeField(field.split("=")[1].split("_")[0]));
 
         if (index > 0) {
           const id = await familyArray[index].codigo;
@@ -99,7 +98,6 @@ const Home = ({
         subIndex = subFamily
           .map((e: any) => e.descricao)
           .indexOf(decodeField(field.split("=")[1].split("_")[0]));
-
 
         const subId = await subFamily[subIndex].codigo;
         for await (const element of productArray) {
@@ -405,7 +403,7 @@ const Home = ({
               </>
             ) : (
               <>
-                {!router.asPath.includes("?") ? (
+                {!router.asPath.includes("=") ? (
                   productArray.map((item: any) => (
                     <React.Fragment key={"selectedCatedory" + item.codigo}>
                       {urlPrice[0] <= item.precovenda &&
@@ -488,14 +486,16 @@ const Home = ({
 
 async function fetchSubFamlies() {
   // Fetch data from endpoint 1
-  const response = await fetch(`${process.env.ZONE_API}subfamily/all`);
+  const response = await fetch(
+    `${process.env.API_URL}/zonesoft/subfamily/all`
+  );
   const data = await response.json();
   return data;
 }
 
 async function fetchFamilies() {
   // Fetch data from endpoint 1
-  const response = await fetch(`${process.env.ZONE_API}family/all`);
+  const response = await fetch(`${process.env.API_URL}/zonesoft/family/all`);
   const data = await response.json();
   return data;
 }
@@ -503,7 +503,7 @@ async function fetchFamilies() {
 // Function to fetch data from the second endpoint
 async function fetchProducts() {
   // Fetch data from endpoint 2
-  const response = await fetch(`${process.env.ZONE_API}products/all`);
+  const response = await fetch(`${process.env.API_URL}/zonesoft/product/all`);
   const data = await response.json();
   return data;
 }
