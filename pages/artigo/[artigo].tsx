@@ -36,6 +36,7 @@ const plusIcon = "/assets/plus.svg";
 // @refresh reset
 const artigoDetail = ({ data1 }: any) => {
   console.log(data1)
+  const data = data1.Response.Content.product;
   const cartState = useSelector(selectCartState);
   const dispatch = useDispatch();
   const [open, setOpen] = React.useState(false);
@@ -44,30 +45,26 @@ const artigoDetail = ({ data1 }: any) => {
   const [CartMessage, setCartMessage] = React.useState(true);
   const [category, setCategory] = React.useState('');
   const router = useRouter();
-  console.log(data1)
   React.useEffect(() => {
     //setIsLoading(true);
+    console.log(data)
+
     let category: any;
     let arr: any;
     axios
-      .get(`/category/${data1.Product.Category_ID}`)
+      .get(`${process.env.ZONE_API}/family/${data.familia}`)
       .then(async (response) => {
         console.log(response.data)
         setCategory(await response.data[0]);
         category = response.data;
 
         await axios
-          .get(`/product/catslug/${encodeURIComponent(category[0].Slug)}`)
+          .get(`${process.env.ZONE_API}/products/${data.familia}`)
           .then((response) => {
-            console.log("catslug results")
             console.log(response.data)
-            arr = response.data.filter(
-              (el: any) => el.Products.id !== data1.Product.id
-            );
+            setSimilarProducts(response.data);
+
           }).catch((error)=> console.log(error))
-          .finally(() => {
-            setSimilarProducts(arr);
-          });
       })
       .finally(() => {
         setIsLoading(false);
@@ -91,35 +88,31 @@ const artigoDetail = ({ data1 }: any) => {
 
   const addToCartHandler = async (article: any) => {
     let arr = [];
-    await axios
-      .get(`/stock/findItemID/${article.Product.Item_ID}`)
-      .then(async (response) => {
-        arr = await response.data;
-      });
-    if (arr.length == 0) {
+   //STOCK
+    if (data.prodstock == 0) {
       return alert("sem stock");
     }
-    if(data1.Product.Amount <= 0){
-      alert("sem")
-    }
+    console.log(article)
+
     if (Number(quantity) <= 0 || quantity.length <= 0) {
       alert("Por favor, introduza uma quantidade!");
     } else {
+
       const index = cartState
         .map((x: any) => {
           return x.id;
         })
-        .indexOf(article.Product.id);
+        .indexOf(article.id);
       if (index <= -1) {
         dispatch(
           cartAddItem({
-            id: article.Product.id,
-            item_ID: article.Product.Item_ID,
-            name: article.Product.Name,
+            id: article.codigo,
+            item_ID: article.descricao,
+            name: article.descricao,
             qty: Number(quantity),
-            price: article.Product.Price,
-            description: article.Product.Description,
-            image: article?.Image_ID[0]?.location,
+            price: article.precovenda,
+            description: article.descricao,
+            image: article?.foto,
           })
         );
       } else {
@@ -140,10 +133,10 @@ const artigoDetail = ({ data1 }: any) => {
     setQuantity(event.target.value);
   };
   React.useEffect(() => {
-    if (data1.Image_ID[0] === undefined) {
-    } else {
-      setImagesArr(data1.Image_ID);
-    }
+    // if (data1.Image_ID[0] === undefined) {
+    // } else {
+    //   setImagesArr(data1.Image_ID);
+    // }
   }, []);
 
   const settings = {
@@ -215,9 +208,17 @@ const artigoDetail = ({ data1 }: any) => {
             xl={6}
             className="wrapper-slider-product"
           >
+                          <div className="img-container">
+                            <img src={
+                  data.foto != null
+                    ? `data:image/jpeg;base64,${data.foto}`
+                    : "/assets/no-product-image.jpg"
+                } alt="" />
+            
+                </div>
             {/* srcpath = "/assets/no-product-image.jpg"; */}
 
-            {ImagesArr.length === 0 ? (
+            {/* {ImagesArr.length === 0 ? (
               <div className="img-container">
                 <img
                   src={"/assets/no-product-image.jpg"}
@@ -237,7 +238,7 @@ const artigoDetail = ({ data1 }: any) => {
                   </div>
                 ))}
               </Slider>
-            )}
+            )} */}
           </Grid>
           {/* INFO PRODUTO */}
           <Grid
@@ -250,13 +251,13 @@ const artigoDetail = ({ data1 }: any) => {
           >
             <div className="product-info">
               <Typography className="product-name">
-                {data1.Product.Name}
+                {data.descricao}
               </Typography>
               <Typography className="product-description">
-                {data1.Product.Description}
+                {data.descricaocurta}
               </Typography>
               <Typography className="product-price">
-                {data1.Product.Price}€
+                {data.precovenda}€
               </Typography>
               <div className="details-wrapper">
                 <Typography className="details-title">
@@ -265,7 +266,7 @@ const artigoDetail = ({ data1 }: any) => {
                 <div className="flex-detail">
                   <Typography className="details-key">Marca:</Typography>
                   <Typography className="details-value">
-                    {data1.Product.Description}
+                    Mudar
                   </Typography>
                 </div>
                 <div className="flex-detail">
@@ -273,19 +274,19 @@ const artigoDetail = ({ data1 }: any) => {
                     Código de Barras:
                   </Typography>
                   <Typography className="details-value">
-                    {data1.Product.EAN}
+                    {data.codbarras}
                   </Typography>
                 </div>
                 <div className="flex-detail">
                   <Typography className="details-key">Descrição:</Typography>
                   <Typography className="details-value">
-                    {data1.Product.Description}
+                    {data.descricao}
                   </Typography>
                 </div>
                 <div className="flex-detail">
                   <Typography className="details-key">Stock:</Typography>
                   <Typography className="details-value">
-                    {data1.Product.Stock}
+                    {data.prodstock}
                   </Typography>
                 </div>
               </div>
@@ -307,7 +308,7 @@ const artigoDetail = ({ data1 }: any) => {
               <Button
                 className="btn-primary"
                 onClick={() => {
-                  addToCartHandler(data1);
+                  addToCartHandler(data);
                 }}
               >
                 Adicionar ao carrinho
@@ -362,9 +363,9 @@ const artigoDetail = ({ data1 }: any) => {
 export async function getServerSideProps(context: any) {
   const id = await context.params.artigo;
   // Fetch data from external API
-  const res = await fetch(`http://localhost:4700/product/${id}`);
-  let data1 = await res.json();
-  // Pass data to the page via props
+  const getID = await id.split('-')[1]
+  const res = await fetch(`${process.env.API_URL}/zonesoft/product/${getID}`);
+  let data1 = await res.json();  
   return { props: { data1 } };
 }
 

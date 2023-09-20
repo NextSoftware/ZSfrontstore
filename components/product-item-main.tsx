@@ -74,7 +74,7 @@ const ProductItemMain = (data: any) => {
                 }
                 className="product-image"
                 onClick={async () => {
-                  //await router.push(`/artigo/${data.codigo}`); //slug?
+                  await router.push(`/artigo/${data.data.descricao}-${data.data.codigo}`); //slug?
                   //router.reload();
                   console.log("click!");
                 }}
