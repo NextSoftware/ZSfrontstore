@@ -168,7 +168,7 @@ function Orders() {
                       <Button
                         className="btn-text"
                         onClick={() => {
-                          window.open("http://localhost:3100/img/sample.pdf");
+                          window.open(`${process.env.API_URL}/img/sample.pdf`);
                         }}
                       >
                         Ver fatura
@@ -256,7 +256,7 @@ function Orders() {
                     {row.Image_has_Products &&
                     row.Image_has_Products.length > 0 ? (
                       <img
-                        src={`http://localhost:3100/img/${row.Image_has_Products[0].Image.location}`}
+                        src={`${process.env.API_URL}/img/${row.Image_has_Products[0].Image.location}`}
                       />
                     ) : (
                       <img src="/assets/no-product-image.jpg" />
