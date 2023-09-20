@@ -505,6 +505,7 @@ async function fetchProducts() {
   // Fetch data from endpoint 2
   const response = await fetch(`${process.env.API_URL}/zonesoft/product/all`);
   const data = await response.json();
+  console.log(data)
   return data;
 }
 
