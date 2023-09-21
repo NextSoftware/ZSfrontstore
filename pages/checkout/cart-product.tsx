@@ -10,9 +10,9 @@ import {
 import { useDispatch } from "react-redux";
 const CartProduct = (props: any) => {
   const dispatch = useDispatch();
-  function checkQty (newValue: number){
-    if(newValue > 0){
-      dispatch(cartQtyItem({id:props.id, qty:Number(newValue)}));
+  function checkQty(newValue: number) {
+    if (newValue > 0) {
+      dispatch(cartQtyItem({ id: props.id, qty: Number(newValue) }));
     }
   }
   console.log(props.img)

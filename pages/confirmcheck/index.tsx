@@ -26,7 +26,7 @@ export default function ConfirmCheck() {
     if (checkoutValidator?.Checkout_Types_ID == 2) {
       setTimeout(async () => {
         await axios
-          .get(`/checkout/${checkoutValidator.id}`)
+          .get(`/zscheckout/${checkoutValidator.id}`)
           .then((response) => {
             console.log(response.data);
             setCheckoutValidator(response.data);
@@ -39,7 +39,7 @@ export default function ConfirmCheck() {
   React.useEffect(() => {
     const jwtUser: any = jwtDecode(cookie?.user?.token);
     axios
-      .get(`/checkout/last/${jwtUser.email}`)
+      .get(`/zscheckout/last/${jwtUser.email}`)
       .then(async (response) => {
         console.log(response.data);
         if (response.data.Checkout_Types_ID != 2) {

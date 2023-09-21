@@ -43,7 +43,7 @@ const artigoDetail = ({ data1 }: any) => {
   const [similarProducts, setSimilarProducts] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [CartMessage, setCartMessage] = React.useState(true);
-  const [category, setCategory] = React.useState('');
+  const [category, setCategory] = React.useState("");
   const router = useRouter();
   React.useEffect(() => {
     //setIsLoading(true);
@@ -88,7 +88,7 @@ const artigoDetail = ({ data1 }: any) => {
 
   const addToCartHandler = async (article: any) => {
     let arr = [];
-   //STOCK
+    //STOCK
     if (data.prodstock == 0) {
       return alert("sem stock");
     }
@@ -191,7 +191,7 @@ const artigoDetail = ({ data1 }: any) => {
               }}
               color="text.primary"
             >
-              {category?.Description}
+              {category?.descricao}
             </Typography>
           </Breadcrumbs>
         </div>
@@ -206,14 +206,16 @@ const artigoDetail = ({ data1 }: any) => {
             xl={6}
             className="wrapper-slider-product"
           >
-                          <div className="img-container">
-                            <img src={
+            <div className="img-container">
+              <img
+                src={
                   data.foto != null
                     ? `data:image/jpeg;base64,${data.foto}`
                     : "/assets/no-product-image.jpg"
-                } alt="" />
-            
-                </div>
+                }
+                alt=""
+              />
+            </div>
             {/* srcpath = "/assets/no-product-image.jpg"; */}
 
             {/* {ImagesArr.length === 0 ? (
@@ -248,9 +250,7 @@ const artigoDetail = ({ data1 }: any) => {
             className="product-info-grid"
           >
             <div className="product-info">
-              <Typography className="product-name">
-                {data.descricao}
-              </Typography>
+              <Typography className="product-name">{data.descricao}</Typography>
               <Typography className="product-description">
                 {data.descricaocurta}
               </Typography>
@@ -263,9 +263,7 @@ const artigoDetail = ({ data1 }: any) => {
                 </Typography>
                 <div className="flex-detail">
                   <Typography className="details-key">Marca:</Typography>
-                  <Typography className="details-value">
-                    Mudar
-                  </Typography>
+                  <Typography className="details-value">Mudar</Typography>
                 </div>
                 <div className="flex-detail">
                   <Typography className="details-key">
@@ -362,9 +360,11 @@ const artigoDetail = ({ data1 }: any) => {
 export async function getServerSideProps(context: any) {
   const id = await context.params.artigo;
   // Fetch data from external API
-  const getID = await id.split('-')[1]
-  const res = await fetch(`${process.env.API_URL}/zonesoft/product/${getID}`);
-  let data1 = await res.json();  
+  const getID = await id.split("-")[1];
+  const res = await axios.get(
+    `http://localhost:3100/zonesoft/product/${getID}`
+  );
+  let data1 = await res.data;
   return { props: { data1 } };
 }
 

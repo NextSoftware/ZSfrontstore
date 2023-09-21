@@ -46,12 +46,15 @@ export default function UserDrawer(props: any) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   async function imageVerif() {
-    console.log(props)
+    console.log(props);
     if (props.userData != undefined) {
       await axios
         .get(`/costumer-has-image/customer/${await props?.userData?.Email}`)
         .then(async (response) => {
-          setPfp("http://localhost:3100/img/" + (await response.data.location));
+          console.log(response)
+          setPfp(
+            `/img/` + (await response.data.location)
+          );
         })
         .finally(() => setIsLoading(false))
         .catch((error) => {

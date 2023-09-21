@@ -53,33 +53,13 @@ import { useCookies } from "react-cookie";
 import Loading from "../../components/loading";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import AddressForm from "../../components/address-form";
-import { FormContainer, TextFieldElement } from "react-hook-form-mui";
-import Head from "next/head";
 
 const productImg = "/assets/product.png";
 const imgCreditcart = "/assets/pay_creditcart.jpg";
-// const imgGooglepay = "/assets/pay_googlepay.jpg";
-// const imgPaypal = "/assets/pay_paypal.jpg";
 const imgMultibanco = "/assets/pay_multibanco.jpg";
 const logoMulti = "/assets/multibanco-logo.png";
 const imgMbWay = "/assets/pay_mbway.webp";
 const steps = ["Carrinho", "Dados", "Pagamento", "Encomenda completa"];
-// const data = {
-//   id: "1234",
-//   productName: "Impressora Brother MFC 0023",
-//   description: "(141,5 x62,5x127,5cm)",
-//   price: "126,79€",
-//   brand: "Brother",
-//   barcode: "03848394893",
-//   stock: "Stock disponível",
-//   productImg: "/assets/product.png",
-// };
-
-const handleEuPagoRequest = () => {};
-const handlePersonalDataChange = async () => {
-  // await axios.put(``).then((response)=>{console.log(response)})
-};
-
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
   ref
@@ -105,11 +85,11 @@ function Checkout({}) {
   const [contact, setContact] = React.useState("");
   const [cookie, setCookie] = useCookies(["user"]);
   const [pCookie, setPcookie] = useCookies(["promoCode"]);
+  const [Customer, setCustomer] = React.useState("");
   const cartState = useSelector(selectCartState);
   const checkIcon = "/assets/check.svg";
   const errorImg = "/assets/errorImg.png";
   const itemCountState = useSelector(selectItemCountState);
-
   const discountedPrice = () => {
     const price = itemCountState[0].priceOfItemsWithIva;
     if (pCookie.promoCode == undefined) {
@@ -127,8 +107,10 @@ function Checkout({}) {
   const checkCart = async () => {
     for await (const item of cartState) {
       axios
-        .get(`/product/${item.id}`)
-        .then((response) => dispatch(cartFixPrice(response.data)))
+        .get(`http://localhost:3100/zonesoft/product/${item.id}`)
+        .then((response) =>
+          dispatch(cartFixPrice(response.data.Response.Content.product))
+        )
         .catch((error) => console.log(error));
     }
   };
@@ -136,34 +118,45 @@ function Checkout({}) {
     setIsLoading(true);
     if (!pCookie?.promoCode.hasOwnProperty("id")) {
       await axios
-        .post(`/checkout`, {
+        .post(`http://localhost:3100/zscheckout`, {
           Valid: true,
           Checkout_Types_ID: 2, // começar com e depois atualizar para completo após a API confirmar que o pagamento foi bem sucedido
           Customer_ID: address[0]?.Customer_ID,
           Address_ID: address[0]?.id,
           PaymentMethod: pm,
           Reference: reference.toString(),
+          Name: "",
         })
-        .then(async (response) => {
+        .then(async (checkout) => {
           await checkCart();
           for await (const iterator of cartState) {
             await axios
-              .post(`/checkout-product`, {
-                Quantity: iterator.qty,
-                Item_ID: iterator.item_ID,
-                Warehouse_ID: 1, // automatizar isto!
-                Checkout_ID: await response.data.id,
+              .post(`http://localhost:3100/article`, {
+                Code: iterator.id.toString(),
+                Name: iterator.name,
+                Price: iterator.price,
               })
-              .then((response) => {
-                console.log(response.data);
+              .then(async (article) => {
+                await axios
+                  .post(`http://localhost:3100/checkout-article`, {
+                    Quantity: iterator.qty,
+                    Checkout_ID: checkout.data.id, // automatizar isto!
+                    Article_ID: article.data.id,
+                  })
+                  .then((response) => {
+                    console.log(response.data);
+                  })
+                  .catch((error) => {
+                    setError(true);
+                    console.log(error.response.data.message);
+                  });
               })
               .catch((error) => {
                 setError(true);
                 console.log(error.response.data.message);
               });
           }
-
-          setCheckoutValidator(await response.data);
+          setCheckoutValidator(await checkout.data);
         })
         .catch((error) => {
           // console.log(error.response);
@@ -176,34 +169,53 @@ function Checkout({}) {
     } else {
       // ATUALIZAR DEPOIS
       await axios
-        .post(`/checkout/code/${pCookie?.promoCode.Code}`, {
-          Valid: true,
-          Checkout_Types_ID: 2, // começar com e depois atualizar para completo após a API confirmar que o pagamento foi bem sucedido
-          Customer_ID: address[0]?.Customer_ID,
-          Address_ID: address[0]?.id,
-          PaymentMethod: pm,
-          Reference: reference.toString(),
-        })
-        .then(async (response) => {
+        .post(
+          `http://localhost:3100/zscheckout/code/${pCookie?.promoCode.Code}`,
+          {
+            Valid: true,
+            Checkout_Types_ID: 2, // começar com e depois atualizar para completo após a API confirmar que o pagamento foi bem sucedido
+            Customer_ID: address[0]?.Customer_ID,
+            Address_ID: address[0]?.id,
+            PaymentMethod: pm,
+            Reference: reference.toString(),
+            Name: "",
+          }
+        )
+        .then(async (checkout) => {
           // console.log(response.data.id);
           //conseguir a warehouse de forma automática
-
+          console.log(checkout.data);
+          await checkCart();
           for await (const iterator of cartState) {
             await axios
-              .post(`/checkout-product`, {
-                Quantity: iterator.qty,
-                Item_ID: iterator.item_ID,
-                Warehouse_ID: 3,
-                Checkout_ID: await response.data.id,
+              .post(`http://localhost:3100/article`, {
+                Code: iterator.id.toString(),
+                Name: iterator.name,
+                Price: iterator.price,
               })
-              .then((response) => {
-                // console.log(response.data);
+              .then(async (article) => {
+                console.log(article.data);
+
+                await axios
+                  .post(`http://localhost:3100/checkout-article`, {
+                    Quantity: iterator.qty,
+                    Checkout_ID: checkout.data.id, // automatizar isto!
+                    Article_ID: article.data.id,
+                  })
+                  .then((response) => {
+                    console.log(response.data);
+                  })
+                  .catch((error) => {
+                    setError(true);
+                    console.log(error.response.data.message);
+                  });
               })
               .catch((error) => {
-                // console.log(error.response.data.message);
+                setError(true);
+                console.log(error.response.data.message);
               });
           }
-          setCheckoutValidator(await response.data);
+          setCheckoutValidator(await checkout.data);
         })
         .catch((error) => {
           // console.log(error.response);
@@ -219,26 +231,23 @@ function Checkout({}) {
   React.useEffect(() => {
     if (cookie.hasOwnProperty("user")) {
       const jwtUser: any = jwtDecode(cookie?.user?.token);
-      // console.log(jwtUser);
+      console.log(jwtUser);
 
-      axios.get(`/address/Email/${jwtUser.email}`).then((response) => {
-        setAddress(response.data);
-      });
-      // .catch((error) => console.log(error));
+      axios
+        .get(`/address/Email/${jwtUser.email}`)
+        .then((response) => {
+          setAddress(response.data);
+        })
+        .catch((error) => console.log(error));
+
+      axios
+        .get(`/Customer/Email/${jwtUser.email}`)
+        .then((response) => {
+          setCustomer(response.data);
+        })
+        .catch((error) => console.log(error));
     } else {
       router.push("/login");
-    }
-
-    //TODO: Aplicar a warehouse automaticamente do produto, mudar logica na API
-    //TODO: Realizar a verificação do euPago q prosegue com o pagamento quando o checkout passa de pendente para concluido
-    //TODO: Melhorar a Logica do checkout consoante a opção de pagamento escolhida
-    if (activeStep == 2) {
-      //logica de pagamento
-    }
-    if (activeStep == 3) {
-      //getCheckout(checkoutValidator?.id);
-      //checkCart();
-      //checkoutDeploy();
     }
   }, [activeStep]);
 
@@ -246,7 +255,7 @@ function Checkout({}) {
     if (reference != undefined) {
       if (checkoutValidator?.Checkout_Types_ID == 2) {
         setTimeout(async () => {
-          await axios.get(`/checkout/${reference}`).then((response) => {
+          await axios.get(`/zscheckout/${reference}`).then((response) => {
             console.log(response.data);
             setCheckoutValidator(response.data);
           });
@@ -269,11 +278,9 @@ function Checkout({}) {
     if (cartState.length == 0) {
       return alert("cart vazio!");
     }
-    console.log(address);
-    if (address == undefined || address.length == 0 && activeStep == 1) {
+    if (address == undefined || (address.length == 0 && activeStep == 1)) {
       return alert("Por favor introduz uma morada de entrega!");
     }
-    // TODO:
     if (activeStep + 1 === 3) {
       switch (paymentOption) {
         case 1: {
@@ -317,7 +324,7 @@ function Checkout({}) {
   };
 
   const handleStep = (step: number) => () => {
-    if(step < 2){
+    if (step < 2) {
       setActiveStep(step);
     }
   };
@@ -340,7 +347,7 @@ function Checkout({}) {
 
   const createMbWayPayment = async (contact: string) => {
     await axios
-      .post("/checkout/payment", {
+      .post("/zscheckout/payment", {
         type: "mbway",
         amount: discountedPrice(),
         contact: contact,
@@ -360,7 +367,7 @@ function Checkout({}) {
 
   const createMultibancoPayment = async () => {
     await axios
-      .post("/checkout/payment", {
+      .post("/zscheckout/payment", {
         type: "multibanco",
         amount: discountedPrice(),
       })
@@ -378,7 +385,7 @@ function Checkout({}) {
 
   const createCreditCardPayment = async (cookie: Object) => {
     await axios
-      .post("/checkout/payment", {
+      .post("/zscheckout/payment", {
         type: "creditcard",
         amount: discountedPrice(),
         email: await cookie?.email,
@@ -390,7 +397,6 @@ function Checkout({}) {
       })
       .catch((error) => setError(true));
   };
-
 
   if (isLoading) {
     return <Loading />;
@@ -517,7 +523,7 @@ function Checkout({}) {
                       </AccordionSummary>
 
                       <AccordionDetails className="flex-content">
-                        <AddressForm data={address[0]?.Customer} />
+                        <AddressForm data={Customer} />
                       </AccordionDetails>
                     </Accordion>
 
@@ -874,8 +880,15 @@ function Checkout({}) {
               )
             ) : (
               <div
-                onLoad={() => {
+                onLoad={async () => {
                   dispatch(cartClear());
+                  await axios.post("http://localhost:3100/zsorder", {
+                    Price: checkoutValidator?.Price,
+                    Customer_ID: checkoutValidator?.Customer_ID,
+                    Checkout_ID: checkoutValidator?.id,
+                    IVA: 2,
+                    ordersId: 1,
+                  });
                 }}
               >
                 {" "}

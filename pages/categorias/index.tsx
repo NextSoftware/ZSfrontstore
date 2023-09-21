@@ -25,7 +25,7 @@ import FourOhFour from "../404";
 import axios from "axios";
 import ProductItemMain from "../../components/product-item-main";
 
-// @ts-ignore
+
 const Home = ({
   dataFromFamilies,
   dataFromSubFamilies,
@@ -106,6 +106,12 @@ const Home = ({
               filteredProductArray.push(element);
             }
           }
+        }
+      }
+
+      if (field.includes("price")) {
+        if (filteredProductArray.length == 0) {
+          filteredProductArray = productArray;
         }
       }
 
@@ -486,26 +492,29 @@ const Home = ({
 
 async function fetchSubFamlies() {
   // Fetch data from endpoint 1
-  const response = await fetch(
-    `${process.env.API_URL}/zonesoft/subfamily/all`
+  const response = await axios.get(
+    `${process.env.REACT_APP_API_URL}/zonesoft/subfamily/all`
   );
-  const data = await response.json();
+  const data = await response.data;
   return data;
 }
 
 async function fetchFamilies() {
   // Fetch data from endpoint 1
-  const response = await fetch(`${process.env.API_URL}/zonesoft/family/all`);
-  const data = await response.json();
+  const response = await axios.get(
+    `${process.env.REACT_APP_API_URL}/zonesoft/family/all`
+  );
+  const data = await response.data;
   return data;
 }
 
 // Function to fetch data from the second endpoint
 async function fetchProducts() {
   // Fetch data from endpoint 2
-  const response = await fetch(`${process.env.API_URL}/zonesoft/product/all`);
-  const data = await response.json();
-  console.log(data)
+  const response = await axios.get(
+    `${process.env.REACT_APP_API_URL}/zonesoft/product/all`
+  );
+  const data = await response.data;
   return data;
 }
 
@@ -517,13 +526,13 @@ export async function getServerSideProps() {
   return { props: { dataFromFamilies, dataFromSubFamilies, dataFromProducts } };
 }
 
-function hasSpecialCharacters(inputString: string) {
-  // Define a regular expression pattern to match any special character.
-  const pattern = /[!@#$%^&*()_+{}\[\]:;"'<>.,?/~`\\|\\\-]/;
+// function hasSpecialCharacters(inputString: string) {
+//   // Define a regular expression pattern to match any special character.
+//   const pattern = /[!@#$%^&*()_+{}\[\]:;"'<>.,?/~`\\|\\\-]/;
 
-  // Use the test() method of the RegExp object to check if the pattern matches the input string.
-  return pattern.test(inputString);
-}
+//   // Use the test() method of the RegExp object to check if the pattern matches the input string.
+//   return pattern.test(inputString);
+// }
 
 function decodeField(field: any) {
   try {

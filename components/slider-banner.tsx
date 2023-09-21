@@ -55,7 +55,7 @@ function SliderBanner() {
                   tempArray.push({
                     Promotion: await element.Promotion,
                     local:
-                      "http://localhost:3100/img/" + (await iterator.location),
+                      `${process.env.REACT_APP_API_URL}/img/` + (await iterator.location),
                   });
                 }
               }

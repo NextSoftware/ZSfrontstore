@@ -44,11 +44,12 @@ const Header = (props: Props) => {
   const [pfp, setPfp] = React.useState("");
   async function imageVerif() {
     if (userCookie != undefined) {
+      console.log(process.env.REACT_APP_API_URL)
       const jwtUser = jwtDecode(await userCookie?.token);
       await axios
-        .get(`/costumer-has-image/customer/${await jwtUser?.email}`)
+        .get(`http://localhost:3100/costumer-has-image/customer/${await jwtUser?.email}`)
         .then(async (response) =>
-          setPfp("http://localhost:3100/img/" + (await response.data.location))
+          setPfp(`http://localhost:3100/img/` + (await response.data.location))
         )
         .catch((error) => {
           console.log("Header");
@@ -78,7 +79,11 @@ const Header = (props: Props) => {
     /* Menu mobile content */
 
     <Box onClick={handleDrawerToggle} className={styles.navMobile}>
-      <Link href="https://nextsoftware.com.pt" target="_blank" sx={{ mt: "30px", mb: "30px" }}>
+      <Link
+        href="https://nextsoftware.com.pt"
+        target="_blank"
+        sx={{ mt: "30px", mb: "30px" }}
+      >
         <Image
           src={myLogo}
           alt="NextSoftware logo"
@@ -137,19 +142,18 @@ const Header = (props: Props) => {
 
             <UserCard pfp={pfp} />
 
-              <Link href={`/checkout`} className={styles.btnCart}>
-                <Image
-                  src={iconCart}
-                  alt="Carrinho"
-                  height={20}
-                  className={styles.iconCart}
-                ></Image>
+            <Link href={`/checkout`} className={styles.btnCart}>
+              <Image
+                src={iconCart}
+                alt="Carrinho"
+                height={20}
+                className={styles.iconCart}
+              ></Image>
 
-                <div className={styles.badge}>
-                  {itemCountState[0].numberOfItems}
-                </div>
-              </Link>
-
+              <div className={styles.badge}>
+                {itemCountState[0].numberOfItems}
+              </div>
+            </Link>
           </div>
         </Toolbar>
       </AppBar>
