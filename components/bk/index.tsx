@@ -37,7 +37,7 @@ const Home = ({ data }: any) => {
   // }, []);
   const getProds = async () => {
     await axios
-      .get("http://localhost:4700/products/all")
+      .get(`${process.env.REACT_APP_API_URL}/products/all`)
       .then(async (response) => {
         setProdArray(await response.data.Response.Content.product);
       })
@@ -107,7 +107,7 @@ const Home = ({ data }: any) => {
                       }
                       await axios
                         .get(
-                          `http://localhost:4700/products/family/${item.codigo}`
+                          `${process.env.REACT_APP_API_URL}/zonesoft/products/family/${item.codigo}`
                         )
                         .then((response) => {
                           console.log(response.data);
@@ -413,7 +413,7 @@ const Home = ({ data }: any) => {
 // // This gets called on every request
 export async function getServerSideProps() {
   // Fetch data from external API
-  const res = await fetch(`http://localhost:4700/family/all`);
+  const res = await fetch(`${process.env.REACT_APP_API_URL}/family/all`);
   let data = await res.json();
   // Pass data to the page via props
   return { props: { data } };

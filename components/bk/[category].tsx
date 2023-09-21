@@ -21,7 +21,6 @@ import {
 } from "@mui/material";
 import Loading from "../../components/loading";
 import Image from "next/image";
-import FourOhFour from "../404";
 
 // @ts-ignore
 const categoria = ({ data }) => {
@@ -281,7 +280,7 @@ const categoria = ({ data }) => {
             }}
             color="text.primary"
           >
-            {data.cateArray[data.cateArray.length-1].Description}
+            {data.cateArray[data.cateArray.length - 1].Description}
           </Typography>
         </Breadcrumbs>
 
@@ -356,20 +355,18 @@ const categoria = ({ data }) => {
               </>
             ) : (
               <div className="success-wrapper-cat">
-              {" "}
-              <Image
-                src={errorImg}
-                alt="Encomenda Completa"
-                width={100}
-                height={100}
-              ></Image>
-              <Typography className="title-container">
-                Não foi possivel encontrar o que procura!
-              </Typography>
-              <Typography>
-                Por favor tente de novo.
-              </Typography>
-            </div>
+                {" "}
+                <Image
+                  src={errorImg}
+                  alt="Encomenda Completa"
+                  width={100}
+                  height={100}
+                ></Image>
+                <Typography className="title-container">
+                  Não foi possivel encontrar o que procura!
+                </Typography>
+                <Typography>Por favor tente de novo.</Typography>
+              </div>
             )}
           </Grid>
         </Grid>
@@ -386,8 +383,8 @@ export async function getServerSideProps(context: any) {
   let data = "";
   // const res = await fetch(`http://localhost:3100/product/catslug/${id}`);
   const res = await fetch(
-    `http://localhost:3100/category/related/${id}`
-  ).catch(() => <FourOhFour />);
+    `${process.env.REACT_APP_API_URL}/zonesoft/product/family/${id}`
+  );
 
   data = await res?.json();
   // Pass data to the page via props

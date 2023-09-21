@@ -493,7 +493,7 @@ const Home = ({
 async function fetchSubFamlies() {
   // Fetch data from endpoint 1
   const response = await axios.get(
-    `${process.env.API_URL}/zonesoft/subfamily/all`
+    `${process.env.REACT_APP_API_URL}/zonesoft/subfamily/all`
   );
   const data = await response.data;
   return data;
@@ -502,7 +502,7 @@ async function fetchSubFamlies() {
 async function fetchFamilies() {
   // Fetch data from endpoint 1
   const response = await axios.get(
-    `${process.env.API_URL}/zonesoft/family/all`
+    `${process.env.REACT_APP_API_URL}/zonesoft/family/all`
   );
   const data = await response.data;
   return data;
@@ -512,7 +512,7 @@ async function fetchFamilies() {
 async function fetchProducts() {
   // Fetch data from endpoint 2
   const response = await axios.get(
-    `${process.env.API_URL}/zonesoft/product/all`
+    `${process.env.REACT_APP_API_URL}/zonesoft/product/all`
   );
   const data = await response.data;
   return data;

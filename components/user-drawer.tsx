@@ -51,8 +51,9 @@ export default function UserDrawer(props: any) {
       await axios
         .get(`/costumer-has-image/customer/${await props?.userData?.Email}`)
         .then(async (response) => {
+          console.log(response)
           setPfp(
-            `${process.env.API_URL}/img/` + (await response.data.location)
+            `/img/` + (await response.data.location)
           );
         })
         .finally(() => setIsLoading(false))

@@ -28,6 +28,7 @@ import axios from "axios";
 import Loading from "../../components/loading";
 import { useRouter } from "next/router";
 import CustomizedSnackbar from "../../components/SnackBar";
+import ProductItemMain from "../../components/product-item-main";
 const bannerImg1 = "/assets/banner.jpg";
 const bannerImg2 = "/assets/banner2.jpg";
 const bannerImg3 = "/assets/banner3.jpg";
@@ -35,7 +36,6 @@ const plusIcon = "/assets/plus.svg";
 
 // @refresh reset
 const artigoDetail = ({ data1 }: any) => {
-  console.log(data1)
   const data = data1.Response.Content.product;
   const cartState = useSelector(selectCartState);
   const dispatch = useDispatch();
@@ -43,32 +43,29 @@ const artigoDetail = ({ data1 }: any) => {
   const [similarProducts, setSimilarProducts] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [CartMessage, setCartMessage] = React.useState(true);
-  const [category, setCategory] = React.useState('');
+  const [category, setCategory] = React.useState("");
   const router = useRouter();
   React.useEffect(() => {
     //setIsLoading(true);
-    console.log(data)
+    const setSimilar = async () => {
+      await axios
+        .get(`http://localhost:3100/zonesoft/product/family/${data.familia}`)
+        .then(async (response) => {
+          const arr = await response.data.Response.Content.product;
+          setSimilarProducts(response.data.Response.Content.product);
+        })
+        .catch((error) => console.log(error));
 
-    let category: any;
-    let arr: any;
-    axios
-      .get(`${process.env.ZONE_API}/family/${data.familia}`)
-      .then(async (response) => {
-        console.log(response.data)
-        setCategory(await response.data[0]);
-        category = response.data;
-
-        await axios
-          .get(`${process.env.ZONE_API}/products/${data.familia}`)
-          .then((response) => {
-            console.log(response.data)
-            setSimilarProducts(response.data);
-
-          }).catch((error)=> console.log(error))
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      await axios
+        .get(`http://localhost:3100/zonesoft/family/${data.familia}`)
+        .then(async (response) => {
+          setCategory(await response.data.Response.Content.family);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    };
+    setSimilar();
   }, []);
 
   const handleClick = () => {
@@ -88,21 +85,19 @@ const artigoDetail = ({ data1 }: any) => {
 
   const addToCartHandler = async (article: any) => {
     let arr = [];
-   //STOCK
+    //STOCK
     if (data.prodstock == 0) {
       return alert("sem stock");
     }
-    console.log(article)
 
     if (Number(quantity) <= 0 || quantity.length <= 0) {
       alert("Por favor, introduza uma quantidade!");
     } else {
-
       const index = cartState
         .map((x: any) => {
           return x.id;
         })
-        .indexOf(article.id);
+        .indexOf(article.codigo);
       if (index <= -1) {
         dispatch(
           cartAddItem({
@@ -117,7 +112,7 @@ const artigoDetail = ({ data1 }: any) => {
         );
       } else {
         dispatch(
-          cartIncrementItem({ id: article.Product.id, qty: Number(quantity) })
+          cartIncrementItem({ id: article.codigo, qty: Number(quantity) })
         );
       }
       // setCartMessage(true);
@@ -193,7 +188,7 @@ const artigoDetail = ({ data1 }: any) => {
               }}
               color="text.primary"
             >
-              {category?.Description}
+              {category?.descricao}
             </Typography>
           </Breadcrumbs>
         </div>
@@ -208,14 +203,16 @@ const artigoDetail = ({ data1 }: any) => {
             xl={6}
             className="wrapper-slider-product"
           >
-                          <div className="img-container">
-                            <img src={
+            <div className="img-container">
+              <img
+                src={
                   data.foto != null
                     ? `data:image/jpeg;base64,${data.foto}`
                     : "/assets/no-product-image.jpg"
-                } alt="" />
-            
-                </div>
+                }
+                alt=""
+              />
+            </div>
             {/* srcpath = "/assets/no-product-image.jpg"; */}
 
             {/* {ImagesArr.length === 0 ? (
@@ -250,9 +247,7 @@ const artigoDetail = ({ data1 }: any) => {
             className="product-info-grid"
           >
             <div className="product-info">
-              <Typography className="product-name">
-                {data.descricao}
-              </Typography>
+              <Typography className="product-name">{data.descricao}</Typography>
               <Typography className="product-description">
                 {data.descricaocurta}
               </Typography>
@@ -265,9 +260,7 @@ const artigoDetail = ({ data1 }: any) => {
                 </Typography>
                 <div className="flex-detail">
                   <Typography className="details-key">Marca:</Typography>
-                  <Typography className="details-value">
-                    Mudar
-                  </Typography>
+                  <Typography className="details-value">Mudar</Typography>
                 </div>
                 <div className="flex-detail">
                   <Typography className="details-key">
@@ -339,19 +332,26 @@ const artigoDetail = ({ data1 }: any) => {
         <div className="product-container related">
           <h2 className="heading">Produtos Relacionados </h2>
 
-          <Stack
-            direction={{ sm: "row" }}
-            spacing={{ xs: 1, sm: 2 }}
-            className="grid-related-products"
-          >
-            {similarProducts.map((item: any) => (
-              <ProductItem
-                data={item}
-                key={"similarProduct" + item.Products.id}
-              />
-            )
-            )}
-          </Stack>
+          {similarProducts.length > 0 && (
+            <Stack
+              direction={{ sm: "row" }}
+              spacing={{ xs: 1, sm: 2 }}
+              className="grid-related-products"
+            >
+              {similarProducts.map((item: any) => (
+                <>
+                  {item.codigo != data.codigo ? (
+                    <ProductItemMain
+                      data={item}
+                      key={"similarProduct" + item.codigo}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </>
+              ))}
+            </Stack>
+          )}
         </div>
       </div>
       <Footer />
@@ -363,9 +363,11 @@ const artigoDetail = ({ data1 }: any) => {
 export async function getServerSideProps(context: any) {
   const id = await context.params.artigo;
   // Fetch data from external API
-  const getID = await id.split('-')[1]
-  const res = await fetch(`${process.env.API_URL}/zonesoft/product/${getID}`);
-  let data1 = await res.json();  
+  const getID = await id.split("-")[1];
+  const res = await axios.get(
+    `http://localhost:3100/zonesoft/product/${getID}`
+  );
+  let data1 = await res.data;
   return { props: { data1 } };
 }
 

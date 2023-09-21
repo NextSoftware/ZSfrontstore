@@ -25,9 +25,11 @@ const AddressForm = (props: any) => {
   const [address, setAddress] = React.useState([]);
   React.useEffect(() => {
     setIsLoading(true);
-    axios
+    const getAddress = ()=>{
+      axios
       .get(`/address/email/${props.data?.Email}`)
       .then(async (response) => {
+        console.log(response.data)
         if ((await response.data.length) != 0) {
           setAddress(await response.data);
         }
@@ -35,7 +37,9 @@ const AddressForm = (props: any) => {
       .catch((error) => {
         console.log(error);
       }).finally(()=>setIsLoading(false));
-      
+    }
+
+      getAddress();
   }, []);
 
   const changeMainAddress = async (formData: FieldValues) => {
@@ -52,7 +56,7 @@ const AddressForm = (props: any) => {
             PhoneNumber: await formData.phone,
             MainAddress: true,
             DeliveryInfo: await formData.notes,
-            Customer_ID: props.data.id,
+            Customer_ID: await props.data.id,
           })
           .then(() => {
             window.location.reload();
@@ -63,7 +67,7 @@ const AddressForm = (props: any) => {
       } else {
         await axios
           .put(
-            `/address/mainAddress/${address[0]?.id}/customer/${props.data.id}`,
+            `/address/mainAddress/${address[0]?.id}/customer/${await props.data.id}`,
             {
               Country: await formData.country,
               CountryCode: "+351",

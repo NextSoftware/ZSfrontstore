@@ -10,20 +10,20 @@ import {
 import { useDispatch } from "react-redux";
 const CartProduct = (props: any) => {
   const dispatch = useDispatch();
-  function checkQty (newValue: number){
-    if(newValue > 0){
-      dispatch(cartQtyItem({id:props.id, qty:Number(newValue)}));
+  function checkQty(newValue: number) {
+    if (newValue > 0) {
+      dispatch(cartQtyItem({ id: props.id, qty: Number(newValue) }));
     }
   }
   return (
     <React.Fragment>
       <div className="each-product-in-cart">
         <div className="product-img-wrapper">
-            {props.img && props.img !== "" ? (
-                <img src={`http://localhost:3100/img/${props.img}`} />
-                ) : (
-                  <img src="/assets/no-product-image.jpg" />
-                )}
+          {props.img && props.img !== "" ? (
+            <img src={`data:image/jpeg;base64,${props.img}`} />
+          ) : (
+            <img src="/assets/no-product-image.jpg" />
+          )}
         </div>
         <div className="cart-product-info">
           <Typography className="cart-product-name">{props.name}</Typography>

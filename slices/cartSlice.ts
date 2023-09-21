@@ -86,7 +86,7 @@ export const cartSlice = createSlice({
         .indexOf(action.payload.id);
 
       if (index > -1) {
-        state.cartState[index].price = action.payload.Price;
+        state.cartState[index].price = action.payload.precovenda;
       }
     },
 

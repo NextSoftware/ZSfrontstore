@@ -44,11 +44,12 @@ const Header = (props: Props) => {
   const [pfp, setPfp] = React.useState("");
   async function imageVerif() {
     if (userCookie != undefined) {
+      console.log(process.env.REACT_APP_API_URL)
       const jwtUser = jwtDecode(await userCookie?.token);
       await axios
-        .get(`/costumer-has-image/customer/${await jwtUser?.email}`)
+        .get(`http://localhost:3100/costumer-has-image/customer/${await jwtUser?.email}`)
         .then(async (response) =>
-          setPfp(`${process.env.API_URL}/img/` + (await response.data.location))
+          setPfp(`http://localhost:3100/img/` + (await response.data.location))
         )
         .catch((error) => {
           console.log("Header");

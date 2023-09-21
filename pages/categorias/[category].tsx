@@ -387,7 +387,7 @@ export async function getServerSideProps() {
   let data = "";
   // const res = await fetch(`http://localhost:3100/product/catslug/${id}`);
   const res = await fetch(
-    `${process.env.API_URL}/zonesoft/family/all`
+    `${process.env.REACT_APP_API_URL}/zonesoft/family/all`
   );
 
   data = await res.json();

@@ -78,6 +78,7 @@ const ProductItemMain = (data: any) => {
                   //router.reload();
                   console.log("click!");
                 }}
+                style={{width:"140px"}}
               ></img>
             </Box>
             <Typography className="cardproduct-name">
