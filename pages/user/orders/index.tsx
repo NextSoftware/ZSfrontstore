@@ -76,16 +76,17 @@ function Orders() {
     const getCheckouts = async () => {
       const jwtUser: any = jwtDecode(cookie?.user?.token);
       await axios
-        .get(`/checkout/indisponivel/${await jwtUser.email}`)
+        .get(`/zscheckout/indisponivel/${await jwtUser.email}`)
         .then((response) => setCheckoutNotReadyList(response.data))
         .catch((error) => console.log(error));
 
       await axios
-        .get(`/checkout/last/${await jwtUser.email}`)
-        .then((response) => setCheckoutLast(response.data))
+        .get(`/zscheckout/last/${await jwtUser.email}`)
+        .then((response) => {setCheckoutLast(response.data)
+        console.log(response.data)})
         .catch((error) => console.log(error));
       await axios
-        .get(`/checkout/customer/${await jwtUser.email}`)
+        .get(`/zscheckout/customer/${await jwtUser.email}`)
         .then((response) => {
           console.log(response.data);
           let array = response.data.sort((a: any, b: any) => b.id - a.id);
@@ -219,8 +220,14 @@ function Orders() {
                   <Typography className="key-text">
                     Método de pagamento
                   </Typography>
-                  <Typography className="value-text">Paypal</Typography>
-                </div>
+                  {checkoutLast?.Checkout?.PaymentMethod === "PC:PT"
+                    ? "Multibanco"
+                    : checkoutLast?.Checkout?.PaymentMethod === "MW:PT"
+                    ? "MBWay"
+                    : checkoutLast?.Checkout?.PaymentMethod === "CC:PT"
+                    ? "Cartão de Credito"
+                    : checkoutLast?.Checkout?.PaymentMethod}                
+    </div>
                 <div className="row">
                   <Typography className="key-text">Processado a</Typography>
                   <Typography className="value-text">
@@ -264,10 +271,10 @@ function Orders() {
                   </div>
                   <div className="cart-product-info">
                     <Typography className="cart-product-name">
-                      {row.Description}
+                      {row.Name}
                     </Typography>
                     <Typography className="cart-product-description">
-                      Ref: {row.id}
+                      Ref: {row.Code}
                     </Typography>
                     <div className="quantity">
                       {row.ckQty} {row.ckQty > 1 ? "Unidades" : "Unidade"}

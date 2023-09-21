@@ -15,15 +15,19 @@ const CartProduct = (props: any) => {
       dispatch(cartQtyItem({ id: props.id, qty: Number(newValue) }));
     }
   }
+  console.log(props.img)
   return (
     <React.Fragment>
       <div className="each-product-in-cart">
         <div className="product-img-wrapper">
-          {props.img && props.img !== "" ? (
-            <img src={`data:image/jpeg;base64,${props.img}`} />
-          ) : (
-            <img src="/assets/no-product-image.jpg" />
-          )}
+        <div className="img-container">
+
+          <img src={
+          props.img != null
+            ? `data:image/jpeg;base64,${props.img}`
+            : "/assets/no-product-image.jpg"
+          } alt="" />
+      </div>
         </div>
         <div className="cart-product-info">
           <Typography className="cart-product-name">{props.name}</Typography>

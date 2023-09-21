@@ -47,25 +47,28 @@ const artigoDetail = ({ data1 }: any) => {
   const router = useRouter();
   React.useEffect(() => {
     //setIsLoading(true);
-    const setSimilar = async () => {
-      await axios
-        .get(`http://localhost:3100/zonesoft/product/family/${data.familia}`)
-        .then(async (response) => {
-          const arr = await response.data.Response.Content.product;
-          setSimilarProducts(response.data.Response.Content.product);
-        })
-        .catch((error) => console.log(error));
+    console.log(data)
 
-      await axios
-        .get(`http://localhost:3100/zonesoft/family/${data.familia}`)
-        .then(async (response) => {
-          setCategory(await response.data.Response.Content.family);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    };
-    setSimilar();
+    let category: any;
+    let arr: any;
+    axios
+      .get(`http://192.168.62.202:3500/zonesoft/family/${data.familia}`)
+      .then(async (response) => {
+        console.log(response.data)
+        setCategory(await response.data[0]);
+        category = response.data;
+
+        await axios
+          .get(`http://192.168.62.202:3500/zonesoft/product/${data.familia}`)
+          .then((response) => {
+            console.log(response.data)
+ 
+            setSimilarProducts(response.data);
+          }).catch((error)=> console.log(error))
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   const handleClick = () => {
@@ -339,16 +342,10 @@ const artigoDetail = ({ data1 }: any) => {
               className="grid-related-products"
             >
               {similarProducts.map((item: any) => (
-                <>
-                  {item.codigo != data.codigo ? (
-                    <ProductItemMain
-                      data={item}
-                      key={"similarProduct" + item.codigo}
-                    />
-                  ) : (
-                    <></>
-                  )}
-                </>
+                <ProductItemMain
+                  data={item}
+                  key={"similarProduct" + item.id}
+                />
               ))}
             </Stack>
           )}
