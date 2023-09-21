@@ -28,6 +28,7 @@ import axios from "axios";
 import Loading from "../../components/loading";
 import { useRouter } from "next/router";
 import CustomizedSnackbar from "../../components/SnackBar";
+import ProductItemMain from "../../components/product-item-main";
 const bannerImg1 = "/assets/banner.jpg";
 const bannerImg2 = "/assets/banner2.jpg";
 const bannerImg3 = "/assets/banner3.jpg";
@@ -35,7 +36,6 @@ const plusIcon = "/assets/plus.svg";
 
 // @refresh reset
 const artigoDetail = ({ data1 }: any) => {
-  console.log(data1)
   const data = data1.Response.Content.product;
   const cartState = useSelector(selectCartState);
   const dispatch = useDispatch();
@@ -52,18 +52,18 @@ const artigoDetail = ({ data1 }: any) => {
     let category: any;
     let arr: any;
     axios
-      .get(`${process.env.ZONE_API}/family/${data.familia}`)
+      .get(`http://192.168.62.202:3500/zonesoft/family/${data.familia}`)
       .then(async (response) => {
         console.log(response.data)
         setCategory(await response.data[0]);
         category = response.data;
 
         await axios
-          .get(`${process.env.ZONE_API}/products/${data.familia}`)
+          .get(`http://192.168.62.202:3500/zonesoft/product/${data.familia}`)
           .then((response) => {
             console.log(response.data)
+ 
             setSimilarProducts(response.data);
-
           }).catch((error)=> console.log(error))
       })
       .finally(() => {
@@ -92,17 +92,15 @@ const artigoDetail = ({ data1 }: any) => {
     if (data.prodstock == 0) {
       return alert("sem stock");
     }
-    console.log(article)
 
     if (Number(quantity) <= 0 || quantity.length <= 0) {
       alert("Por favor, introduza uma quantidade!");
     } else {
-
       const index = cartState
         .map((x: any) => {
           return x.id;
         })
-        .indexOf(article.id);
+        .indexOf(article.codigo);
       if (index <= -1) {
         dispatch(
           cartAddItem({
@@ -117,7 +115,7 @@ const artigoDetail = ({ data1 }: any) => {
         );
       } else {
         dispatch(
-          cartIncrementItem({ id: article.Product.id, qty: Number(quantity) })
+          cartIncrementItem({ id: article.codigo, qty: Number(quantity) })
         );
       }
       // setCartMessage(true);
@@ -339,19 +337,20 @@ const artigoDetail = ({ data1 }: any) => {
         <div className="product-container related">
           <h2 className="heading">Produtos Relacionados </h2>
 
-          <Stack
-            direction={{ sm: "row" }}
-            spacing={{ xs: 1, sm: 2 }}
-            className="grid-related-products"
-          >
-            {similarProducts.map((item: any) => (
-              <ProductItem
-                data={item}
-                key={"similarProduct" + item.Products.id}
-              />
-            )
-            )}
-          </Stack>
+          {similarProducts.length > 0 && (
+            <Stack
+              direction={{ sm: "row" }}
+              spacing={{ xs: 1, sm: 2 }}
+              className="grid-related-products"
+            >
+              {similarProducts.map((item: any) => (
+                <ProductItemMain
+                  data={item}
+                  key={"similarProduct" + item.id}
+                />
+              ))}
+            </Stack>
+          )}
         </div>
       </div>
       <Footer />

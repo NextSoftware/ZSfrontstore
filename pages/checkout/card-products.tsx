@@ -34,7 +34,7 @@ function CardProducts() {
   const cartState = useSelector(selectCartState);
   //const itemCountState = useSelector(selectItemCountState);
   const dispatch = useDispatch();
-
+console.log(cartState)
   return (
     <React.Fragment>
       {cartState.map((item: any) => (
