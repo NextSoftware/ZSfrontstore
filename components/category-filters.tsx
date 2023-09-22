@@ -251,13 +251,13 @@ const CategoryFilters = ({
                           encodeURI(
                             `category=${item.descricao +
                               "_" +
-                              item.lastupdate.split(".")[1]}`
+                              item.codigo}`
                           )
                         ) ||
                         router.asPath.includes(
                           `category=${item.descricao +
                             "_" +
-                            item.lastupdate.split(".")[1]}`
+                            item.codigo}`
                         )
                           ? true
                           : false
@@ -271,7 +271,7 @@ const CategoryFilters = ({
                         let field = "";
                         field = `category=${item.descricao +
                           "_" +
-                          item.lastupdate.split(".")[1]}`;
+                          item.codigo}`;
 
                         if (checkEvent.target.checked == true) {
                           urlManager(field);
@@ -296,7 +296,7 @@ const CategoryFilters = ({
                             encodeURI(
                               `subcat=${subFam.descricao +
                                 "_" +
-                                subFam.lastupdate.split(".")[1]}`
+                                subFam.codigo}`
                             )
                           )
                             ? true
@@ -311,7 +311,7 @@ const CategoryFilters = ({
                           let field = "";
                           field = `subcat=${subFam.descricao +
                             "_" +
-                            subFam.lastupdate.split(".")[1]}`;
+                            subFam.codigo}`;
 
                           if (checkEvent.target.checked == true) {
                             //console.log(field);

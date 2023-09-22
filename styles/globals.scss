@@ -215,7 +215,7 @@ a:active {
   }
 }
 
-.category-list-card2{
+.category-list-card2 {
   background-color: #fff;
   border-radius: 50%;
   width: 150px;
@@ -252,7 +252,7 @@ a:active {
   @include flex(center, center, column);
   padding: 0 !important;
   margin-bottom: 10px;
-  
+
   img {
     max-width: 65px;
     max-height: 55px;
@@ -276,7 +276,7 @@ a:active {
   max-width: 300px;
   border-radius: 8px;
   box-shadow: none;
-  // filter: drop-shadow(0px 2px 1px -1px rgb(0 0 0 / 0%));
+  filter: drop-shadow(0px 2px 1px -1px rgb(0 0 0 / 0%));
   border: 1px solid #e4e4e4;
   height: 100%;
 
@@ -288,16 +288,16 @@ a:active {
 
 .card-content-product {
   background-color: #ffffff;
-  padding: 16px !important;
+  //padding: 16px !important;
   //border: 1px solid #c7c7c7;
   @include flex(space-between, stretch, column);
-  gap: 6px;
+  gap: 12px;
   height: 100%;
 }
 
 .flex-content {
   @include flex(flex-start, stretch, column);
-  gap: 6px;
+  gap: 4px;
 }
 
 .cardproduct-name {
@@ -311,12 +311,8 @@ a:active {
 .product-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  // display: block;
-  // max-width:230px;
-  max-height: 250px;
-  // width: auto;
-  // height: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .btn-add-cart {
@@ -369,7 +365,7 @@ a:active {
 .wrapper-filters {
   border-radius: 0 8px 8px 0;
   overflow: hidden;
-  height:100vh;
+  height: 100vh;
   background-color: #fff;
 }
 .filters-header {
@@ -558,10 +554,9 @@ a:active {
 .grid-related-products {
   overflow-x: scroll;
   padding-bottom: 20px;
-
   a {
     min-width: 200px;
-    max-width: 300px;
+    max-width: 200px;
   }
 }
 
@@ -1159,7 +1154,7 @@ a:active {
       border-radius: 6px;
       padding: 20px;
       height: 70%;
-      
+
       .subcategory-name {
         @include font($semibold, 16px, $black);
         line-height: 18px;
@@ -1299,7 +1294,7 @@ a:active {
 
 .banner {
   overflow: hidden;
-  
+
   .imgBannerWrapper {
     height: 100%;
     max-height: 500px;

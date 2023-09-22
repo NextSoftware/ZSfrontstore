@@ -338,18 +338,21 @@ const artigoDetail = ({ data1 }: any) => {
               spacing={{ xs: 1, sm: 2 }}
               className="grid-related-products"
             >
-              {similarProducts.map((item: any) => (
-                <>
-                  {item.codigo != data.codigo ? (
-                    <ProductItemMain
-                      data={item}
-                      key={"similarProduct" + item.codigo}
-                    />
-                  ) : (
-                    <></>
-                  )}
-                </>
-              ))}
+              {similarProducts.map((item: any) =>
+                item.codigo != data.codigo ? (
+                  <Grid
+                    xs={12}
+                    sm={4}
+                    md={4}
+                    lg={4}
+                    key={"similarProduct" + item.codigo}
+                  >
+                    <ProductItemMain data={item} />
+                  </Grid>
+                ) : (
+                  <></>
+                )
+              )}
             </Stack>
           )}
         </div>
@@ -363,7 +366,7 @@ const artigoDetail = ({ data1 }: any) => {
 export async function getServerSideProps(context: any) {
   const id = await context.params.artigo;
   // Fetch data from external API
-  const getID = await id.split("-")[1];
+  const getID = await id.split("_")[1];
   const res = await axios.get(
     `http://localhost:3100/zonesoft/product/${getID}`
   );

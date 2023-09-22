@@ -57,8 +57,8 @@ const ProductItemMain = (data: any) => {
     <div>
       <Card className="card-product">
         <CardContent className="card-content-product">
-          <div className="flex-content">
-            <Box component="div" className="product-image-wrapper">
+          <div className="flex-content" >
+            <Box component="div" className="product-image-wrapper" sx={{height:"200px"}}>
               <img
                 src={
                   data.data?.foto != null
@@ -68,10 +68,8 @@ const ProductItemMain = (data: any) => {
                 className="product-image"
                 onClick={async () => {
                   await router.push(
-                    `/artigo/${data.data.descricao}-${data.data.codigo}`
-                  ); //slug?
-                  //router.reload();
-                  console.log("click!");
+                    `/artigo/${data.data.descricao}_${data.data.codigo}`
+                  );
                 }}
               ></img>
             </Box>

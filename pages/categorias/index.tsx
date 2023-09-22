@@ -25,21 +25,20 @@ import FourOhFour from "../404";
 import axios from "axios";
 import ProductItemMain from "../../components/product-item-main";
 
-
 const Home = ({
   dataFromFamilies,
   dataFromSubFamilies,
   dataFromProducts,
 }: any) => {
   const router = useRouter();
-  const { category } = router.query;
+  const productArray = dataFromProducts.Response.Content.product;
+  const familyArray = dataFromFamilies.Response.Content.family;
+  const subFamily: Array<any> = dataFromSubFamilies.Response.Content.subfamily;
   const errorImg = "/assets/not_found.png";
   const [orderBy, setOrderBy] = React.useState("");
   const [filterProdArray, setFilterProdArray] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const productArray = dataFromProducts.Response.Content.product;
-  const familyArray = dataFromFamilies.Response.Content.family;
-  const subFamily: Array<any> = dataFromSubFamilies.Response.Content.subfamily;
+
   const [urlPrice, setUrlPrice] = React.useState<number[]>([
     Math.min(...productArray.map((o: any) => o.precovenda)),
     Math.max(...productArray.map((o: any) => o.precovenda)),
@@ -73,17 +72,10 @@ const Home = ({
     filterArray = await filterArray.sort();
     for await (const field of filterArray) {
       if (field.includes("category") && !router.asPath.includes("sub")) {
-        let index;
-
-        //try with decode, if decode gives error just grab it without decoding
-        index = familyArray
-          .map((e: any) => e.descricao)
-          .indexOf(decodeField(field.split("=")[1].split("_")[0]));
-
+        let index = decodeField(field.split("=")[1].split("_")[1]);
         if (index > 0) {
-          const id = await familyArray[index].codigo;
           for await (const element of productArray) {
-            if (element.familia == id) {
+            if (element.familia == index) {
               if (!filteredProductArray.includes(element)) {
                 filteredProductArray.push(element);
               }
@@ -93,15 +85,9 @@ const Home = ({
       }
 
       if (field.includes("subcat")) {
-        let subIndex;
-
-        subIndex = subFamily
-          .map((e: any) => e.descricao)
-          .indexOf(decodeField(field.split("=")[1].split("_")[0]));
-
-        const subId = await subFamily[subIndex].codigo;
+        let subIndex = decodeField(field.split("=")[1].split("_")[1]);
         for await (const element of productArray) {
-          if (element.subfam == subId) {
+          if (element.subfam == subIndex) {
             if (!filteredProductArray.includes(element)) {
               filteredProductArray.push(element);
             }
@@ -289,9 +275,6 @@ const Home = ({
       urlManager(`orderBy=${event.target.value}`);
     }
   };
-
-  //if (data.prodArray == undefined) return <FourOhFour />;
-
   //if (isLoading) return <Loading />;
   return (
     <div className="background-wrapper">
@@ -439,50 +422,6 @@ const Home = ({
                 )}
               </>
             )}
-
-            {/* {!window.location.href.includes("?") ? (
-              data.prodArray.map((item: any) => (
-                <Grid
-                  xs={12}
-                  sm={4}
-                  md={3}
-                  lg={2}
-                  key={"selectedCatedory" + item.Product.id}
-                >
-                  <ProductItem data={item} />
-                </Grid>
-              ))
-            ) : filterProdArray.length > 0 ? (
-              <>
-                {filterProdArray.map((item: any) => (
-                  <Grid
-                    xs={12}
-                    sm={4}
-                    md={3}
-                    lg={2}
-                    key={"selectedCatedory" + item.Products.id}
-                  >
-                    <ProductItem data={item} />
-                  </Grid>
-                ))}
-              </>
-            ) : (
-              <div className="success-wrapper-cat">
-              {" "}
-              <Image
-                src={errorImg}
-                alt="Encomenda Completa"
-                width={100}
-                height={100}
-              ></Image>
-              <Typography className="title-container">
-                Não foi possivel encontrar o que procura!
-              </Typography>
-              <Typography>
-                Por favor tente de novo.
-              </Typography>
-            </div>
-            )} */}
           </Grid>
         </Grid>
       </Grid>
@@ -492,18 +431,18 @@ const Home = ({
 
 async function fetchSubFamlies() {
   // Fetch data from endpoint 1
-  const response = await axios.get(
-    `${process.env.REACT_APP_API_URL}/zonesoft/subfamily/all`
-  );
+  const response = await axios
+    .get(`${process.env.REACT_APP_API_URL}/zonesoft/subfamily/all`)
+    .catch((error) => console.log(error));
   const data = await response.data;
   return data;
 }
 
 async function fetchFamilies() {
   // Fetch data from endpoint 1
-  const response = await axios.get(
-    `${process.env.REACT_APP_API_URL}/zonesoft/family/all`
-  );
+  const response = await axios
+    .get(`${process.env.REACT_APP_API_URL}/zonesoft/family/all`)
+    .catch((error) => new Error(error));
   const data = await response.data;
   return data;
 }
@@ -511,9 +450,9 @@ async function fetchFamilies() {
 // Function to fetch data from the second endpoint
 async function fetchProducts() {
   // Fetch data from endpoint 2
-  const response = await axios.get(
-    `${process.env.REACT_APP_API_URL}/zonesoft/product/all`
-  );
+  const response = await axios
+    .get(`${process.env.REACT_APP_API_URL}/zonesoft/product/all`)
+    .catch((error) => console.log(error));
   const data = await response.data;
   return data;
 }
@@ -525,14 +464,6 @@ export async function getServerSideProps() {
   const dataFromProducts = await fetchProducts();
   return { props: { dataFromFamilies, dataFromSubFamilies, dataFromProducts } };
 }
-
-// function hasSpecialCharacters(inputString: string) {
-//   // Define a regular expression pattern to match any special character.
-//   const pattern = /[!@#$%^&*()_+{}\[\]:;"'<>.,?/~`\\|\\\-]/;
-
-//   // Use the test() method of the RegExp object to check if the pattern matches the input string.
-//   return pattern.test(inputString);
-// }
 
 function decodeField(field: any) {
   try {

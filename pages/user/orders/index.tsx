@@ -195,7 +195,7 @@ function Orders() {
                     {checkoutLast?.totalProducts} Artigos
                   </Typography>
                   <Typography className="value-text">
-                    {((checkoutLast?.Checkout?.Price * 100) / 100).toFixed(2)}€
+                    {checkoutLast?.Checkout?.Price.toFixed(2)}€
                   </Typography>
                 </div>
                 <div className="row">
