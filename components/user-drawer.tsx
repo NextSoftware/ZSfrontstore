@@ -53,8 +53,9 @@ export default function UserDrawer(props: any) {
         .then(async (response) => {
           console.log(response)
           setPfp(
-            `/img/` + (await response.data.location)
+            `http://localhost:3100/img/` + (await response.data.location)
           );
+          console.log(`/img/` + (await response.data.location))
         })
         .finally(() => setIsLoading(false))
         .catch((error) => {

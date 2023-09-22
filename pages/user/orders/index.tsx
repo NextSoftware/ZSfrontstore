@@ -260,11 +260,14 @@ function Orders() {
               {checkoutLast?.Products?.map((row: any) => (
                 <div className="each-product-in-order" key={row.id}>
                   <div className="product-img-wrapper">
-                    {row.Image_has_Products &&
-                    row.Image_has_Products.length > 0 ? (
+                    {row.img != null ? (
+                      <>
                       <img
-                        src={`${process.env.API_URL}/img/${row.Image_has_Products[0].Image.location}`}
-                      />
+                          src={
+                            row.img != null
+                              ? `data:image/jpeg;base64,${row.img}`
+                              : "/assets/no-product-image.jpg"
+                          }/></>
                     ) : (
                       <img src="/assets/no-product-image.jpg" />
                     )}{" "}
