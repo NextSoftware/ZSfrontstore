@@ -55,6 +55,7 @@ const AddressForm = (props: any) => {
             DoorNumber: "99",
             PhoneNumber: await formData.phone,
             MainAddress: true,
+            District: await formData.district,
             DeliveryInfo: await formData.notes,
             Customer_ID: await props.data.id,
           })
@@ -77,6 +78,7 @@ const AddressForm = (props: any) => {
               DoorNumber: "99",
               PhoneNumber: await formData.phone,
               MainAddress: true,
+              District: await formData.district,
               DeliveryInfo: await formData.notes,
             }
           )
@@ -105,7 +107,7 @@ const AddressForm = (props: any) => {
     nif: props.data?.NIF,
     postalCode: address[0]?.PostalCode,
     phone: address[0]?.PhoneNumber,
-    district: "",
+    district: address[0]?.District,
     country: address[0]?.Country,
     notes: address[0]?.DeliveryInfo,
     city: address[0]?.City,

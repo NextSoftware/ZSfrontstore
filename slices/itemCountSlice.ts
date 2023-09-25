@@ -41,7 +41,7 @@ export const itemCountSlice = createSlice({
       state.itemCountState[0].priceOfItems = priceTotal;
       state.itemCountState[0].priceOfItemsWithIva = +(
         priceTotal *
-        (1 + getRegion(action.payload.postalcode, "Normal"))
+        (1 + getRegion(action.payload.postalcode, "NORMAL"))
       ).toFixed(2);
     },
   },

@@ -51,16 +51,19 @@ function PersonalInfo(props: any) {
           oldpassword: formData.actualPass,
           newPassword: formData.pass,
         }) .then((response) => {
-          <CustomizedSnackbar
-              severity={"success"}
-              message={"Palavra-Passe alterada com sucesso!"}
-            />
+          // <CustomizedSnackbar
+          //     severity={"success"}
+          //     message={"Palavra-Passe alterada com sucesso!"}
+          //   />
+          alert("Palavra-Passe alterada com sucesso!");
         })
         .catch((error) => {
-          <CustomizedSnackbar
-          severity={"error"}
-          message={"Algo deu errado, verifique as informações fornecidas e tente novamente!"}
-        />
+        //   <CustomizedSnackbar
+        //   severity={"error"}
+        //   message={"Algo deu errado, verifique as informações fornecidas e tente novamente!"}
+
+        // />
+        alert("Algo deu errado, verifique a 'Palavra-Passe atual' e tente novamente!");
         });
 
     }

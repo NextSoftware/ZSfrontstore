@@ -81,7 +81,7 @@ function Orders() {
         .catch((error) => console.log(error));
 
       await axios
-        .get(`/zscheckout/last/${await jwtUser.email}`)
+        .get(`/zscheckout/lastOrder/${await jwtUser.email}`)
         .then((response) => {setCheckoutLast(response.data)
         console.log(response.data)})
         .catch((error) => console.log(error));
@@ -184,7 +184,7 @@ function Orders() {
 
           <div>
             <Typography className="heading-user margintop">
-              Resumo da encomenda nº{checkoutLast?.Checkout?.id}
+              Resumo da encomenda nº{checkoutLast?.ZS_Checkouts?.id}
             </Typography>
 
             {checkoutLast && (
@@ -195,7 +195,7 @@ function Orders() {
                     {checkoutLast?.totalProducts} Artigos
                   </Typography>
                   <Typography className="value-text">
-                    {checkoutLast?.Checkout?.Price.toFixed(2)}€
+                    {checkoutLast?.Order?.ZS_Checkouts?.Price.toFixed(2)}€
                   </Typography>
                 </div>
                 <div className="row">
@@ -208,7 +208,7 @@ function Orders() {
                     <span>(Taxas incluídas)</span>
                   </Typography>
                   <Typography className="value-text price">
-                    {((checkoutLast?.Checkout?.TaxedPrice * 100) / 100).toFixed(
+                    {((checkoutLast?.Order?.ZS_Checkouts?.TaxedPrice * 100) / 100).toFixed(
                       2
                     )}
                     €
@@ -220,18 +220,18 @@ function Orders() {
                   <Typography className="key-text">
                     Método de pagamento
                   </Typography>
-                  {checkoutLast?.Checkout?.PaymentMethod === "PC:PT"
-                    ? "Multibanco"
-                    : checkoutLast?.Checkout?.PaymentMethod === "MW:PT"
+                  {checkoutLast?.Order?.ZS_Checkouts?.PaymentMethod === "PC:PT"
+                    ? "Multibanco?"
+                    : checkoutLast?.Order?.ZS_Checkouts?.PaymentMethod === "MW:PT"
                     ? "MBWay"
-                    : checkoutLast?.Checkout?.PaymentMethod === "CC:PT"
+                    : checkoutLast?.Order?.ZS_Checkouts?.PaymentMethod === "CC:PT"
                     ? "Cartão de Credito"
-                    : checkoutLast?.Checkout?.PaymentMethod}                
+                    : checkoutLast?.Order?.ZS_Checkouts?.PaymentMethod}                
     </div>
                 <div className="row">
                   <Typography className="key-text">Processado a</Typography>
                   <Typography className="value-text">
-                    {checkoutLast?.Checkout?.Date.toString().split("T")[0]}
+                    {checkoutLast?.Order?.ZS_Checkouts?.Date.toString().split("T")[0]}
                   </Typography>
                 </div>
                 <div className="row">

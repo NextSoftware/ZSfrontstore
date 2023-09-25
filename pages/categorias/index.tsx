@@ -85,6 +85,7 @@ const Home = ({
       }
 
       if (field.includes("subcat")) {
+        filteredProductArray = [];
         let subIndex = decodeField(field.split("=")[1].split("_")[1]);
         for await (const element of productArray) {
           if (element.subfam == subIndex) {
@@ -285,7 +286,7 @@ const Home = ({
           aria-label="breadcrumb"
           separator={<NavigateNextIcon fontSize="small" />}
         >
-          <Link
+          {/* <Link
             underline="hover"
             sx={{ display: "flex", alignItems: "center" }}
             color="inherit"
@@ -309,16 +310,7 @@ const Home = ({
             href="/categorias"
           >
             Categorias
-          </Link>
-          <Typography
-            sx={{
-              display: "flex",
-              alignItems: "center",
-            }}
-            color="text.primary"
-          >
-            {/* {data.cateArray[data.cateArray.length-1].Description} */}
-          </Typography>
+          </Link> */}
         </Breadcrumbs>
 
         <div className="inputs-wrapper">
