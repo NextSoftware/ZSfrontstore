@@ -51,11 +51,11 @@ function Registar() {
           NIF: formData.registerNif,
           Password: formData.pass,
         })
-        .then(async function (response) {
+        .then(async function(response) {
           console.log(response);
           router.push("/login");
         })
-        .catch(async function (error) {
+        .catch(async function(error) {
           alert(error.response.data.message);
         });
     }

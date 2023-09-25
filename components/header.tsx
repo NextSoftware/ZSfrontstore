@@ -42,12 +42,15 @@ const Header = (props: Props) => {
   const cookies = new Cookies();
   const userCookie = cookies.get("user");
   const [pfp, setPfp] = React.useState("");
+  const [postalcode, setPostalcode] = React.useState("");
   async function imageVerif() {
     if (userCookie != undefined) {
-      console.log(process.env.REACT_APP_API_URL)
+      console.log(process.env.REACT_APP_API_URL);
       const jwtUser = jwtDecode(await userCookie?.token);
       await axios
-        .get(`http://localhost:3100/costumer-has-image/customer/${await jwtUser?.email}`)
+        .get(
+          `http://localhost:3100/costumer-has-image/customer/${await jwtUser?.email}`
+        )
         .then(async (response) =>
           setPfp(`http://localhost:3100/img/` + (await response.data.location))
         )
@@ -55,11 +58,17 @@ const Header = (props: Props) => {
           console.log("Header");
           console.log(error);
         });
+
+      await axios
+        .get(
+          `http://localhost:3100/address/Email/${await jwtUser?.email}`
+        )
+        .then((response) => setPostalcode(response.data[0].PostalCode)).catch((error)=>console.log(error));
     }
   }
 
   React.useEffect(() => {
-    dispatch(setItemCountState(cartState));
+    dispatch(setItemCountState({ cartState ,postalcode:postalcode === ""||undefined?"1000-000":postalcode}));
     //imageVerif();
   });
 
@@ -133,9 +142,9 @@ const Header = (props: Props) => {
             </Link>
           </div>
           <div className={styles.menuEnd}>
-            <Link href="/categorias" className={styles.menuItemLink}>
+            {/* <Link href="/categorias" className={styles.menuItemLink}>
               <Button className={styles.menuItem}>Página Inicial</Button>
-            </Link>
+            </Link> */}
             <Link href="/categorias" className={styles.menuItemLink}>
               <Button className={styles.menuItem}>Produtos</Button>
             </Link>

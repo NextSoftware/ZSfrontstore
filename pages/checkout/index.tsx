@@ -97,7 +97,7 @@ function Checkout({}) {
     }
 
     if (pCookie.promoCode.Type == "DISCOUNT") {
-      return price - (price / 100) * pCookie.promoCode?.Quantity;
+      return price - price * (pCookie.promoCode?.Quantity / 100);
     } else if (pCookie.promoCode.Type == "MONEY") {
       return price - pCookie.promoCode?.Quantity;
     }
@@ -136,6 +136,7 @@ function Checkout({}) {
                 Code: iterator.id.toString(),
                 Name: iterator.name,
                 Price: iterator.price,
+                IVA_Type: "NORMAL",
               })
               .then(async (article) => {
                 await axios
@@ -194,6 +195,7 @@ function Checkout({}) {
                 Code: iterator.id.toString(),
                 Name: iterator.name,
                 Price: iterator.price,
+                IVA_Type: "NORMAL",
               })
               .then(async (article) => {
                 console.log(article.data);
@@ -249,7 +251,10 @@ function Checkout({}) {
         })
         .catch((error) => console.log(error));
     } else {
-      router.push("/login");
+      if (activeStep === 1) {
+        alert("Tem de ter uma conta para realizar uma compra!");
+        router.push("/login");
+      }
     }
   }, [activeStep]);
 
@@ -280,6 +285,7 @@ function Checkout({}) {
     if (cartState.length == 0) {
       return alert("cart vazio!");
     }
+
     if (address == undefined || (address.length == 0 && activeStep == 1)) {
       return alert("Por favor introduz uma morada de entrega!");
     }
@@ -708,7 +714,7 @@ function Checkout({}) {
                 <Typography className="title-order">A sua encomenda</Typography>
               </div>
               <div className="content-cart">
-                <TotalContainer />
+                <TotalContainer address={address} />
                 <Button
                   className="btn-secondary"
                   onClick={() => {

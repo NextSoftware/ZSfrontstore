@@ -6,9 +6,8 @@ import {
   cartRemoveItem,
   selectCartState,
 } from "../../slices/cartSlice";
-import itemCountSlice, {
+import {
   selectItemCountState,
-  setItemCountState,
 } from "../../slices/itemCountSlice";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -19,21 +18,17 @@ function TotalContainer(props: any) {
   const [promoCode, setPromoCode] = React.useState<any>("");
   const [value, setValue] = React.useState("");
   const [cookie, setCookie, removeCookie] = useCookies(["promoCode"]);
- 
+
   const applyDiscount = async () => {
     await axios
-      .get(
-        `/promo-code/code/${localStorage.getItem(
-          "inputValue"
-        )}`
-      )
+      .get(`/promo-code/code/${localStorage.getItem("inputValue")}`)
       .then((response) => {
         setPromoCode(response.data);
         setCookie("promoCode", JSON.stringify(response.data), {
           path: "/",
           maxAge: 900, // Expires after 1hr
           sameSite: true,
-        });
+        });      
       })
       .catch((error) => {
         setPromoCode("");
@@ -47,12 +42,7 @@ function TotalContainer(props: any) {
   }, []);
 
   const discountedPrice = () => {
-    const price =
-      Math.round(
-        (itemCountState[0].priceOfItems +
-          itemCountState[0].priceOfItems * 0.23) *
-          100
-      ) / 100;
+    const price = itemCountState[0].priceOfItemsWithIva
     let discPrice = 0;
     if (promoCode) {
       discPrice = price;
@@ -65,19 +55,6 @@ function TotalContainer(props: any) {
     return discPrice;
   };
 
-  const totalPriceShow = async () => {
-    const price =
-      Math.round(
-        (itemCountState[0].priceOfItems +
-          itemCountState[0].priceOfItems * 0.23) *
-          100
-      ) / 100;
-    if (cookie.promoCode != "") {
-      return price - discountedPrice();
-    } else {
-      return price;
-    }
-  };
   return (
     <>
       <React.Fragment>
@@ -87,18 +64,20 @@ function TotalContainer(props: any) {
           <div className="flex-row">
             <Typography className="text-row">Valor produtos:</Typography>
             <Typography className="text-row">
-              {(itemCountState[0].priceOfItems).toFixed(2)}€
+              {itemCountState[0].priceOfItems.toFixed(2)}€
             </Typography>
           </div>
           <div className="flex-row">
             <Typography className="text-row">Valor IVA:</Typography>
             <Typography className="text-row">
-              {Math.round(itemCountState[0].priceOfItems * 0.23 * 100) / 100}€
+              {itemCountState[0].priceOfItemsWithIva-itemCountState[0].priceOfItems}€
             </Typography>
           </div>
           <div className="flex-row">
             <Typography className="text-row">Descontos:</Typography>
-            <Typography className="text-row">-{discountedPrice().toFixed(2)}€</Typography>
+            <Typography className="text-row">
+              -{discountedPrice().toFixed(2)}€
+            </Typography>
           </div>
           <div className="flex-row">
             <Typography className="text-row">Código promocional:</Typography>
@@ -123,19 +102,10 @@ function TotalContainer(props: any) {
           <Typography className="total-text">Total:</Typography>
           <Typography className="total-text">
             {cookie.promoCode != ""
-              ? (Math.round(
-                  (itemCountState[0].priceOfItems +
-                    itemCountState[0].priceOfItems * 0.23) *
-                    100
-                ) /
-                  100 -
-                discountedPrice()).toFixed(2)
-              : (Math.round(
-                  (itemCountState[0].priceOfItems +
-                    itemCountState[0].priceOfItems * 0.23) *
-                    100
-                ) / 100).toFixed(2)}
-               
+              ? (
+                itemCountState[0].priceOfItemsWithIva-discountedPrice()
+                ).toFixed(2)
+              : itemCountState[0].priceOfItemsWithIva.toFixed(2)}
             €
           </Typography>
         </div>
