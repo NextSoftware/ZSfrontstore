@@ -221,7 +221,7 @@ function Orders() {
                     Método de pagamento
                   </Typography>
                   {checkoutLast?.Order?.ZS_Checkouts?.PaymentMethod === "PC:PT"
-                    ? "Multibanco?"
+                    ? "Multibanco"
                     : checkoutLast?.Order?.ZS_Checkouts?.PaymentMethod === "MW:PT"
                     ? "MBWay"
                     : checkoutLast?.Order?.ZS_Checkouts?.PaymentMethod === "CC:PT"
