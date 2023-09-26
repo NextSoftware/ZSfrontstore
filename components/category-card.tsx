@@ -12,7 +12,7 @@ const CategoryCard = (data: any, className: string) => {
           {/* <img
             src={
               data.data.hasOwnProperty("imageLocation")
-                ? `http://localhost:3100/img/${data.data.imageLocation}`
+                ? `/img/${data.data.imageLocation}`
                 : "/assets/no-product-image.jpg"
             }
             alt="product-1"

@@ -49,7 +49,7 @@ const artigoDetail = ({ data1 }: any) => {
     //setIsLoading(true);
     const setSimilar = async () => {
       await axios
-        .get(`http://localhost:3100/zonesoft/product/family/${data.familia}`)
+        .get(`/zonesoft/product/family/${data.familia}`)
         .then(async (response) => {
           const arr = await response.data.Response.Content.product;
           setSimilarProducts(response.data.Response.Content.product);
@@ -57,7 +57,7 @@ const artigoDetail = ({ data1 }: any) => {
         .catch((error) => console.log(error));
 
       await axios
-        .get(`http://localhost:3100/zonesoft/family/${data.familia}`)
+        .get(`/zonesoft/family/${data.familia}`)
         .then(async (response) => {
           setCategory(await response.data.Response.Content.family);
         })
@@ -228,7 +228,7 @@ const artigoDetail = ({ data1 }: any) => {
                 {ImagesArr.map((item: any) => (
                   <div className="img-container" key={"ImageArtigo" + item.id}>
                     <img
-                      src={`http://localhost:3100/img/${item.location}`}
+                      src={`/img/${item.location}`}
                       alt="Promoções"
                       className="imgProduct"
                     ></img>
@@ -368,7 +368,7 @@ export async function getServerSideProps(context: any) {
   // Fetch data from external API
   const getID = await id.split("_")[1];
   const res = await axios.get(
-    `http://localhost:3100/zonesoft/product/${getID}`
+    `/zonesoft/product/${getID}`
   );
   let data1 = await res.data;
   return { props: { data1 } };

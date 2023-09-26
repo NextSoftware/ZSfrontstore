@@ -54,7 +54,7 @@ const Header2 = (props: any) => {
       await axios
         .get(`/costumer-has-image/customer/${await jwtUser?.email}`)
         .then(async (response) =>
-          setPfp("http://localhost:3100/img/" + (await response.data.location))
+          setPfp("/img/" + (await response.data.location))
         )
         .catch((error) => {
           console.log("Header");

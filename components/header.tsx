@@ -49,10 +49,10 @@ const Header = (props: Props) => {
       const jwtUser = jwtDecode(await userCookie?.token);
       await axios
         .get(
-          `http://localhost:3100/costumer-has-image/customer/${await jwtUser?.email}`
+          `/costumer-has-image/customer/${await jwtUser?.email}`
         )
         .then(async (response) =>
-          setPfp(`http://localhost:3100/img/` + (await response.data.location))
+          setPfp(`/img/` + (await response.data.location))
         )
         .catch((error) => {
           console.log("Header");
@@ -61,7 +61,7 @@ const Header = (props: Props) => {
 
       await axios
         .get(
-          `http://localhost:3100/address/Email/${await jwtUser?.email}`
+          `/address/Email/${await jwtUser?.email}`
         )
         .then((response) => setPostalcode(response.data[0].PostalCode)).catch((error)=>console.log(error));
     }

@@ -12,7 +12,7 @@ const App = ({ Component, ...rest }: AppProps) => {
   const cookies = new Cookies();
   const userCookie = cookies.get("user");
   axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-  axios.defaults.baseURL = "http://localhost:3100"
+  axios.defaults.baseURL = ""
   if (userCookie != undefined) {
     axios.interceptors.request.use(async (request): Promise<any> => {
       request.headers.Authorization = `Bearer ${await userCookie?.token}`;

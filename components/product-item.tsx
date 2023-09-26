@@ -28,7 +28,7 @@ const ProductItem = (data: any) => {
       srcpath = "/assets/no-product-image.jpg";
     } else {
       console.log(data.data.Images);
-      srcpath = `http://localhost:3100/img/${data.data.Image_ID[0].location}`;
+      srcpath = `/img/${data.data.Image_ID[0].location}`;
     }
     return srcpath;
   }

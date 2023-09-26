@@ -107,7 +107,7 @@ function Checkout({}) {
   const checkCart = async () => {
     for await (const item of cartState) {
       axios
-        .get(`http://localhost:3100/zonesoft/product/${item.id}`)
+        .get(`/zonesoft/product/${item.id}`)
         .then((response) =>
           dispatch(cartFixPrice(response.data.Response.Content.product))
         )
@@ -118,7 +118,7 @@ function Checkout({}) {
     setIsLoading(true);
     if (!pCookie?.promoCode.hasOwnProperty("id")) {
       await axios
-        .post(`http://localhost:3100/zscheckout`, {
+        .post(`/zscheckout`, {
           Valid: true,
           Checkout_Types_ID: 2, // começar com e depois atualizar para completo após a API confirmar que o pagamento foi bem sucedido
           Customer_ID: address[0]?.Customer_ID,
@@ -132,7 +132,7 @@ function Checkout({}) {
           await checkCart();
           for await (const iterator of cartState) {
             await axios
-              .post(`http://localhost:3100/article`, {
+              .post(`/article`, {
                 Code: iterator.id.toString(),
                 Name: iterator.name,
                 Price: iterator.price,
@@ -140,7 +140,7 @@ function Checkout({}) {
               })
               .then(async (article) => {
                 await axios
-                  .post(`http://localhost:3100/checkout-article`, {
+                  .post(`/checkout-article`, {
                     Quantity: iterator.qty,
                     Checkout_ID: checkout.data.id, // automatizar isto!
                     Article_ID: article.data.id,
@@ -172,7 +172,7 @@ function Checkout({}) {
       // ATUALIZAR DEPOIS
       await axios
         .post(
-          `http://localhost:3100/zscheckout/code/${pCookie?.promoCode.Code}`,
+          `/zscheckout/code/${pCookie?.promoCode.Code}`,
           {
             Valid: true,
             Checkout_Types_ID: 2, // começar com e depois atualizar para completo após a API confirmar que o pagamento foi bem sucedido
@@ -191,7 +191,7 @@ function Checkout({}) {
           await checkCart();
           for await (const iterator of cartState) {
             await axios
-              .post(`http://localhost:3100/article`, {
+              .post(`/article`, {
                 Code: iterator.id.toString(),
                 Name: iterator.name,
                 Price: iterator.price,
@@ -201,7 +201,7 @@ function Checkout({}) {
                 console.log(article.data);
 
                 await axios
-                  .post(`http://localhost:3100/checkout-article`, {
+                  .post(`/checkout-article`, {
                     Quantity: iterator.qty,
                     Checkout_ID: checkout.data.id, // automatizar isto!
                     Article_ID: article.data.id,
@@ -890,7 +890,7 @@ function Checkout({}) {
               <div
                 onLoad={async () => {
                   dispatch(cartClear());
-                  await axios.post("http://localhost:3100/zsorder", {
+                  await axios.post("/zsorder", {
                     Price: checkoutValidator?.Price,
                     Customer_ID: checkoutValidator?.Customer_ID,
                     Checkout_ID: checkoutValidator?.id,
