@@ -70,7 +70,7 @@ function TotalContainer(props: any) {
           <div className="flex-row">
             <Typography className="text-row">Valor IVA:</Typography>
             <Typography className="text-row">
-              {itemCountState[0].priceOfItemsWithIva-itemCountState[0].priceOfItems}€
+              {(itemCountState[0].priceOfItemsWithIva-itemCountState[0].priceOfItems).toFixed(2)}€
             </Typography>
           </div>
           <div className="flex-row">
