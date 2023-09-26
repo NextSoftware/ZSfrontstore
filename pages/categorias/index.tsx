@@ -31,18 +31,36 @@ const Home = ({
   dataFromProducts,
 }: any) => {
   const router = useRouter();
-  const productArray = dataFromProducts.Response.Content.product;
-  const familyArray = dataFromFamilies.Response.Content.family;
-  const subFamily: Array<any> = dataFromSubFamilies.Response.Content.subfamily;
+  const productArray = dataFromProducts?.Response?.Content?.product || [];
+  const familyArray = dataFromFamilies?.Response?.Content?.family || [];
+  const subFamily: Array<any> =
+    dataFromSubFamilies?.Response?.Content?.subfamily || [];
   const errorImg = "/assets/not_found.png";
   const [orderBy, setOrderBy] = React.useState("");
   const [filterProdArray, setFilterProdArray] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [urlPrice, setUrlPrice] = React.useState<number[]>([0, 0]);
 
-  const [urlPrice, setUrlPrice] = React.useState<number[]>([
-    Math.min(...productArray.map((o: any) => o.precovenda)),
-    Math.max(...productArray.map((o: any) => o.precovenda)),
-  ]);
+  React.useEffect(() => {
+    if (productArray && productArray.length > 0) {
+      const minPrice = Math.min(...productArray.map((o: any) => o.precovenda));
+      const maxPrice = Math.max(...productArray.map((o: any) => o.precovenda));
+      setUrlPrice([minPrice, maxPrice]);
+    } else {
+      setTimeout(async () => {
+        axios
+          .get("zonesoft/auth")
+          .then((response) => console.log(response))
+          .catch((error) => console.log(error))
+          .finally(() => {
+            if (window != undefined) {
+              window.location.reload();
+            }
+          });
+      }, 5000);
+    }
+  }, [productArray]);
+
   React.useEffect(() => {
     const deployItems = async () => {
       //verificar se tem filtros
@@ -62,9 +80,12 @@ const Home = ({
       } else {
         setFilterProdArray([]);
       }
+
       setIsLoading(false);
     };
-    deployItems();
+    if (productArray.length > 0) {
+      deployItems();
+    }
   }, [router]);
 
   async function arrayFilter(filterArray: any) {
@@ -276,7 +297,13 @@ const Home = ({
       urlManager(`orderBy=${event.target.value}`);
     }
   };
-  //if (isLoading) return <Loading />;
+  if (isLoading)
+    return (
+      <>
+        <Header />
+        <Loading />
+      </>
+    );
   return (
     <div className="background-wrapper">
       <Header />
@@ -353,14 +380,26 @@ const Home = ({
       <Grid container spacing={2} className={styles.contentWrapper}>
         <Grid xs={6} sm={4} md={3} lg={2}>
           <CategoryFilters
-            famArray={familyArray}
-            subFamArray={subFamily}
-            prodArray={productArray}
-            min={Math.min(...productArray.map((o: any) => o.precovenda))}
-            max={Math.max(...productArray.map((o: any) => o.precovenda))}
-            step={Math.round(
-              Math.max(...productArray.map((o: any) => o.precovenda)) / 14
-            )}
+            famArray={familyArray || []}
+            subFamArray={subFamily || []}
+            prodArray={productArray || []}
+            min={
+              productArray && productArray.length > 0
+                ? Math.min(...productArray.map((o: any) => o.precovenda))
+                : 0 // Default value for min price
+            }
+            max={
+              productArray && productArray.length > 0
+                ? Math.max(...productArray.map((o: any) => o.precovenda))
+                : 0 // Default value for max price
+            }
+            step={
+              productArray && productArray.length > 0
+                ? Math.round(
+                    Math.max(...productArray.map((o: any) => o.precovenda)) / 14
+                  )
+                : 1 // Default step value
+            }
             urlPrice={urlPrice}
             setUrlPrice={setUrlPrice}
           />
@@ -424,18 +463,24 @@ const Home = ({
 async function fetchSubFamlies() {
   // Fetch data from endpoint 1
   const response = await axios
-    .get(`${process.env.REACT_APP_API_URL}/zonesoft/subfamily/all`)
+    .get(`/zonesoft/subfamily/all`)
     .catch((error) => console.log(error));
-  const data = await response.data;
+  if (response?.data == undefined) {
+    return null;
+  }
+  const data = await response?.data;
   return data;
 }
 
 async function fetchFamilies() {
   // Fetch data from endpoint 1
   const response = await axios
-    .get(`${process.env.REACT_APP_API_URL}/zonesoft/family/all`)
+    .get(`/zonesoft/family/all`)
     .catch((error) => new Error(error));
-  const data = await response.data;
+  if (response?.data == undefined) {
+    return null;
+  }
+  const data = await response?.data;
   return data;
 }
 
@@ -443,9 +488,13 @@ async function fetchFamilies() {
 async function fetchProducts() {
   // Fetch data from endpoint 2
   const response = await axios
-    .get(`${process.env.REACT_APP_API_URL}/zonesoft/product/all`)
+    .get(`/zonesoft/product/all`)
     .catch((error) => console.log(error));
-  const data = await response.data;
+
+  if (response?.data == undefined) {
+    return null;
+  }
+  const data = await response?.data;
   return data;
 }
 

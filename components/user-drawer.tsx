@@ -53,7 +53,7 @@ export default function UserDrawer(props: any) {
         .then(async (response) => {
           console.log(response)
           setPfp(
-            `/img/` + (await response.data.location)
+            `https://nextapi.local.lt/img/` + (await response.data.location)
           );
           console.log(`/img/` + (await response.data.location))
         })
