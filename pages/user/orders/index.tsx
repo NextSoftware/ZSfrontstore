@@ -19,6 +19,7 @@ import jwtDecode from "jwt-decode";
 import { useCookies } from "react-cookie";
 import Popup from "../../../components/popup";
 import PdfViewer from "../../../components/PdfPreview";
+import Loading from "../../../components/loading";
 
 // const barcodeImg = "/assets/barcode.jpg";
 // const productImg = "/assets/product.png";
@@ -61,7 +62,7 @@ function createData(
 
 function Orders() {
   const [value, setValue] = React.useState("0");
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [isOpen, setIsOpen] = React.useState(false);
   const [cookie, setCookie] = useCookies(["user"]);
   const [checkoutList, setCheckoutList] = React.useState<any>([]);
@@ -72,7 +73,6 @@ function Orders() {
   const [prodImage, setProdImage] = React.useState("0");
 
   React.useEffect(() => {
-    setIsLoading(true);
     const getCheckouts = async () => {
       const jwtUser: any = jwtDecode(cookie?.user?.token);
       await axios
@@ -80,11 +80,7 @@ function Orders() {
         .then((response) => setCheckoutNotReadyList(response.data))
         .catch((error) => console.log(error));
 
-      await axios
-        .get(`/zscheckout/lastOrder/${await jwtUser.email}`)
-        .then((response) => {setCheckoutLast(response.data)
-        console.log(response.data)})
-        .catch((error) => console.log(error));
+     
       await axios
         .get(`/zscheckout/customer/${await jwtUser.email}`)
         .then((response) => {
@@ -95,7 +91,22 @@ function Orders() {
         .catch((error) => {
           console.log(error);
         })
-        .finally(() => setIsLoading(false));
+        await axios
+        .get(`/zscheckout/lastOrder/${await jwtUser.email}`)
+        .then((response) => {setCheckoutLast(response.data);
+        setIsLoading(false)})
+        .catch((error) =>  
+        setTimeout(async () => {
+          axios
+            .get("zonesoft/auth")
+            .then((response) => console.log(response))
+            .catch((error) => console.log(error))
+            .finally(() => {
+              if (window != undefined) {
+                window.location.reload();
+              }
+            });
+        }, 5000))
     };
     getCheckouts();
   }, []);
@@ -104,6 +115,12 @@ function Orders() {
     setValue(newValue);
   };
 
+  if (isLoading)
+  return (
+    <>
+      <Loading />
+    </>
+  );
   return (
     <>
       <TabContext value={value}>

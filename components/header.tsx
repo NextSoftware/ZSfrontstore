@@ -52,7 +52,7 @@ const Header = (props: Props) => {
           `/costumer-has-image/customer/${await jwtUser?.email}`
         )
         .then(async (response) =>
-          setPfp(`/img/` + (await response.data.location))
+          setPfp(`https://nextapi.loca.lt/img/` + (await response.data.location))
         )
         .catch((error) => {
           console.log("Header");

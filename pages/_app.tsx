@@ -12,7 +12,7 @@ const App = ({ Component, ...rest }: AppProps) => {
   const cookies = new Cookies();
   const userCookie = cookies.get("user");
   axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-  axios.defaults.baseURL = "https://nextapi.loca.lt"
+  axios.defaults.baseURL = "https://nextapi.loca.lt";
   if (userCookie != undefined) {
     axios.interceptors.request.use(async (request): Promise<any> => {
       request.headers.Authorization = `Bearer ${await userCookie?.token}`;
