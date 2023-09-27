@@ -65,18 +65,18 @@ export const selectItemCountState = (state: AppState) =>
 export default itemCountSlice.reducer;
 
 function getRegion(cp: string, ivatype: string) {
-  let IVA = 0;
-  const cpsplit = cp.split("-");
-  const tonumber = Number(cpsplit[0]);
-  console.log(ivatype);
-  if (tonumber >= 9000 && tonumber <= 9400) {
-    IVA = ivatype === "NORMAL" ? 22 : ivatype === "INTERMEDIA" ? 12 : 5; //Madeira
-  } else if (tonumber <= 9900 && tonumber > 9400) {
-    IVA = ivatype === "NORMAL" ? 16 : ivatype === "INTERMEDIA" ? 9 : 4; // Açores
-  } else if (1000 <= tonumber && tonumber < 9000) {
-    IVA = ivatype === "NORMAL" ? 23 : ivatype === "INTERMEDIA" ? 13 : 6; // Continente
-  } else {
-    IVA = 23;
-  }
-  return IVA / 100;
+  //let IVA = 0;
+  // const cpsplit = cp.split("-");
+  // const tonumber = Number(cpsplit[0]);
+  // console.log(ivatype);
+  // if (tonumber >= 9000 && tonumber <= 9400) {
+  //   IVA = ivatype === "NORMAL" ? 22 : ivatype === "INTERMEDIA" ? 12 : 5; //Madeira
+  // } else if (tonumber <= 9900 && tonumber > 9400) {
+  //   IVA = ivatype === "NORMAL" ? 16 : ivatype === "INTERMEDIA" ? 9 : 4; // Açores
+  // } else if (1000 <= tonumber && tonumber < 9000) {
+  //   IVA = ivatype === "NORMAL" ? 23 : ivatype === "INTERMEDIA" ? 13 : 6; // Continente
+  // } else {
+  //   IVA = 23;
+  // }
+  return 18 / 100;
 }

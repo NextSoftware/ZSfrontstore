@@ -161,10 +161,9 @@ function Checkout({}) {
           setCheckoutValidator(await checkout.data);
         })
         .catch((error) => {
-          // console.log(error.response);
+          console.log(error.response);
         })
         .finally(() => {
-          //dispatch(cartClear());
           setActiveStep(3);
           setIsLoading(false);
         });

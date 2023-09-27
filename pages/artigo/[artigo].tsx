@@ -41,29 +41,50 @@ const artigoDetail = ({ data1 }: any) => {
   const dispatch = useDispatch();
   const [open, setOpen] = React.useState(false);
   const [similarProducts, setSimilarProducts] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [CartMessage, setCartMessage] = React.useState(true);
   const [category, setCategory] = React.useState("");
   const router = useRouter();
   React.useEffect(() => {
     //setIsLoading(true);
     const setSimilar = async () => {
+      let errorExists = false;
       await axios
         .get(`/zonesoft/product/family/${data.familia}`)
         .then(async (response) => {
           const arr = await response.data.Response.Content.product;
           setSimilarProducts(response.data.Response.Content.product);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          console.log(error);
+          errorExists = true;
+        });
 
       await axios
         .get(`/zonesoft/family/${data.familia}`)
         .then(async (response) => {
           setCategory(await response.data.Response.Content.family);
         })
-        .finally(() => {
-          setIsLoading(false);
+        .catch((error) => {
+          console.log(error);
+          errorExists = true;
         });
+
+      if (errorExists) {
+        setTimeout(async () => {
+          axios
+            .get("zonesoft/auth")
+            .then((response) => console.log(response))
+            .catch((error) => console.log(error))
+            .finally(() => {
+              if (window != undefined) {
+                window.location.reload();
+              }
+            });
+        }, 5000);
+      } else {
+        setIsLoading(false);
+      }
     };
     setSimilar();
   }, []);
@@ -115,13 +136,13 @@ const artigoDetail = ({ data1 }: any) => {
           cartIncrementItem({ id: article.codigo, qty: Number(quantity) })
         );
       }
-      // setCartMessage(true);
-      // await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for state to update
-      // setCartMessage(false);
+      setCartMessage(true);
+      await new Promise((resolve) => setTimeout(resolve, 0)); // Wait for state to update
+      setCartMessage(false);
     }
   };
 
-  const [quantity, setQuantity] = React.useState("");
+  const [quantity, setQuantity] = React.useState("1");
   const [ImagesArr, setImagesArr] = React.useState([]);
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -144,7 +165,13 @@ const artigoDetail = ({ data1 }: any) => {
     arrows: true,
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading)
+    return (
+      <>
+        <Header />
+        <Loading />
+      </>
+    );
 
   return (
     <>
@@ -296,6 +323,7 @@ const artigoDetail = ({ data1 }: any) => {
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   handleChange(event);
                 }}
+                value={quantity}
               />
 
               <Button
@@ -306,12 +334,12 @@ const artigoDetail = ({ data1 }: any) => {
               >
                 Adicionar ao carrinho
               </Button>
-              {/* {!CartMessage ? (
+              {!CartMessage ? (
                 <CustomizedSnackbar
                   severity={"success"}
                   message={"Produto adicionado ao Carrinho!"}
                 />
-              ) : null} */}
+              ) : null}
 
               <Snackbar
                 open={open}
@@ -367,9 +395,7 @@ export async function getServerSideProps(context: any) {
   const id = await context.params.artigo;
   // Fetch data from external API
   const getID = await id.split("_")[1];
-  const res = await axios.get(
-    `/zonesoft/product/${getID}`
-  );
+  const res = await axios.get(`/zonesoft/product/${getID}`);
   let data1 = await res.data;
   return { props: { data1 } };
 }
