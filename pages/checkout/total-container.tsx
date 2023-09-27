@@ -103,9 +103,9 @@ function TotalContainer(props: any) {
           <Typography className="total-text">
             {cookie.promoCode != ""
               ? (
-                itemCountState[0].priceOfItemsWithIva-discountedPrice()
+                itemCountState[0].priceOfItems-discountedPrice()
                 ).toFixed(2)
-              : itemCountState[0].priceOfItemsWithIva.toFixed(2)}
+              : itemCountState[0].priceOfItems.toFixed(2)}
             €
           </Typography>
         </div>

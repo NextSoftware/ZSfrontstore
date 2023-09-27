@@ -91,7 +91,7 @@ function Checkout({}) {
   const errorImg = "/assets/errorImg.png";
   const itemCountState = useSelector(selectItemCountState);
   const discountedPrice = () => {
-    const price = itemCountState[0].priceOfItemsWithIva;
+    const price = itemCountState[0].priceOfItems;
     if (pCookie.promoCode == undefined) {
       return price;
     }
